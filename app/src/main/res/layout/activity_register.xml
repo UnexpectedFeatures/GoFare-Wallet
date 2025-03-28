@@ -58,7 +58,7 @@
         <!-- Lower Layout (40%) -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="850dp"
+            android:layout_height="1050dp"
             android:layout_marginVertical="4dp"
             android:gravity="center"
             >
@@ -81,7 +81,7 @@
                     >
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/signUpUndoButton"
+                        android:id="@+id/toLogin"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                         android:layout_width="48dp"
                         android:layout_height="48dp"
@@ -145,6 +145,44 @@
                     />
 
                 <TextView
+                    android:id="@+id/middleNameLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:textSize="16dp"
+                    android:text="Middle Name:" />
+
+                <EditText
+                    android:id="@+id/middleNameEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:background="@drawable/textbox_stroke"
+                    android:paddingHorizontal="8dp"
+                    android:hint="Largo"
+                    android:layout_marginBottom="20dp"
+                    />
+
+                <TextView
+                    android:id="@+id/addressLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:textSize="16dp"
+                    android:text="Address:" />
+
+                <EditText
+                    android:id="@+id/addressEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:ems="10"
+                    android:inputType="text"
+                    android:background="@drawable/textbox_stroke"
+                    android:paddingHorizontal="8dp"
+                    android:hint="example St. test Rd."
+                    android:layout_marginBottom="20dp"
+                    />
+
+                <TextView
                     android:id="@+id/ageLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
@@ -170,29 +208,28 @@
                     android:textSize="16dp"
                     android:text="Gender:" />
 
-                <LinearLayout
+                <RadioGroup
+                    android:id="@+id/genderRadioGrp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:orientation="horizontal"
                     >
 
-
                     <RadioButton
-                        android:id="@+id/radioButton"
+                        android:id="@+id/maleRadio"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Male" />
 
-
                     <RadioButton
-                        android:id="@+id/radioButton2"
+                        android:id="@+id/femaleRadio"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Female" />
 
-                </LinearLayout>
+                </RadioGroup>
 
                 <TextView
                     android:id="@+id/emailLabel"
@@ -258,7 +295,7 @@
                     >
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/gcashButton"
+                        android:id="@+id/signUpBtn"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"

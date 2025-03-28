@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "266381062474",
+    "firebase_url": "https://appdev-75624-default-rtdb.firebaseio.com",
+    "project_id": "appdev-75624",
+    "storage_bucket": "appdev-75624.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266381062474:android:5df60b1431c2af0c7291b3",
+        "android_client_info": {
+          "package_name": "com.example.gofare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJKXsZE6Gcd0rcyKccW4oJvuW9BiS3J4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
