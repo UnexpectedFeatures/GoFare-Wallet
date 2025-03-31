@@ -14,7 +14,6 @@ import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
 
-
     lateinit var toRegister : TextView
     lateinit var toResetPassword : TextView
     lateinit var emailInput : EditText
@@ -64,6 +63,11 @@ class MainActivity : AppCompatActivity() {
                 if (task.isSuccessful()) {
                     Toast.makeText(this, "Log In Success", Toast.LENGTH_SHORT).show()
                     Log.d("Firebase", "Login Successful")
+                    val intent = Intent(
+                        this@MainActivity,
+                        HomeActivity::class.java
+                    )
+                    startActivity(intent)
                 } else {
                     Log.e("Firebase", "Login Failed", task.getException())
                 }
