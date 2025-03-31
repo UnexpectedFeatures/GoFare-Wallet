@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <resources>
+        <style name="BottomNavActiveText">
+            <item name="android:textSize">12sp</item>
+            <item name="android:textColor">#000000</item>
+        </style>
+
+        <style name="BottomNavInactiveText">
+            <item name="android:textSize">12sp</item>
+            <item name="android:textColor">#888888</item>
+        </style>
+    </resources>
+
+</resources>
