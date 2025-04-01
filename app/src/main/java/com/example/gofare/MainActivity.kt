@@ -2,9 +2,11 @@ package com.example.gofare
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -19,17 +21,18 @@ class MainActivity : AppCompatActivity() {
     lateinit var emailInput : EditText
     lateinit var passwordInput : EditText
     lateinit var loginButton : MaterialButton
+    lateinit var toggleVisibility : ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-
         toRegister = findViewById(R.id.toRegister);
         emailInput = findViewById(R.id.emailEditText);
         passwordInput = findViewById(R.id.passwordEditText);
         toResetPassword = findViewById(R.id.forgotPassword);
         loginButton = findViewById(R.id.loginButton);
+        toggleVisibility = findViewById(R.id.togglePasswordBtn);
 
         toRegister.setOnClickListener(View.OnClickListener {
             val intent = Intent(
@@ -38,6 +41,22 @@ class MainActivity : AppCompatActivity() {
             )
             startActivity(intent)
         });
+
+        var isPasswordVisible = false
+
+        toggleVisibility.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+
+            if (isPasswordVisible) {
+                passwordInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                toggleVisibility.setImageResource(R.drawable.eye)
+            } else {
+                passwordInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                toggleVisibility.setImageResource(R.drawable.eye_closed)
+            }
+
+            passwordInput.setSelection(passwordInput.text.length) // Keep cursor at end
+        }
 
         loginButton.setOnClickListener(View.OnClickListener {
             val email = emailInput.text.toString().trim()
