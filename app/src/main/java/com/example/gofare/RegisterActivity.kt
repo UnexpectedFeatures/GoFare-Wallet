@@ -10,6 +10,7 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import at.favre.lib.crypto.bcrypt.BCrypt
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -24,6 +25,7 @@ class RegisterActivity : AppCompatActivity() {
     lateinit var addressTxt : EditText
     lateinit var genderRadioGrp: RadioGroup
     lateinit var emailTxt : EditText
+    lateinit var contactTxt : EditText
     lateinit var passwordTxt : EditText
     lateinit var confirmPasswordTxt : EditText
     lateinit var signUpBtn : com.google.android.material.button.MaterialButton
@@ -40,6 +42,7 @@ class RegisterActivity : AppCompatActivity() {
         ageTxt = findViewById(R.id.ageEditText)
         addressTxt = findViewById(R.id.addressEditText)
         genderRadioGrp = findViewById(R.id.genderRadioGrp)
+        contactTxt = findViewById(R.id.contactEditText)
         emailTxt = findViewById(R.id.emailEditText)
         passwordTxt = findViewById(R.id.passwordEditText)
         confirmPasswordTxt = findViewById(R.id.confirmPasswordEditText)
@@ -59,6 +62,7 @@ class RegisterActivity : AppCompatActivity() {
             val middleName = middleNameTxt.text.toString().trim()
             val age = ageTxt.text.toString().trim()
             val address = addressTxt.text.toString().trim()
+            val contactNumber = contactTxt.text.toString().replace("+", "").replace("-", "").replace(" ", "")
             val email = emailTxt.text.toString().trim()
             val password = passwordTxt.text.toString().trim()
             val confirmPassword = confirmPasswordTxt.text.toString().trim()
@@ -78,13 +82,14 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, "Passwords do not match!", Toast.LENGTH_SHORT).show()
                 return@OnClickListener
             }
+
             var auth: FirebaseAuth = FirebaseAuth.getInstance()
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid
                         if (userId != null) {
-                            saveUserToDatabase(userId, firstName, lastName, middleName, age, address, gender, email)
+                            saveUserToDatabase(userId, firstName, lastName, middleName, age, address, gender, contactNumber, email, password)
                         }
                         Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show()
                         startActivity(Intent(this, MainActivity::class.java))
@@ -94,8 +99,11 @@ class RegisterActivity : AppCompatActivity() {
                 }
         })
     }
-    private fun saveUserToDatabase(userId: String, firstName: String, lastName: String, middleName: String, age: String, address: String, gender: String, email: String) {
-        val databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId)
+    private fun saveUserToDatabase(userId: String, firstName: String, lastName: String, middleName: String, age: String, address: String, gender: String, contactNo : String, email : String, password : String) {
+        val databaseRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
+
+        val normalizedPhone = contactNo.replace("+", "").replace("-", "").replace(" ", "")
+        val hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray())
 
         val userData = mapOf(
             "firstName" to firstName,
@@ -104,15 +112,18 @@ class RegisterActivity : AppCompatActivity() {
             "age" to age,
             "address" to address,
             "gender" to gender,
-            "email" to email
+            "contactNumber" to normalizedPhone,
+            "email" to email,
+            "hashedPassword" to hashedPassword
         )
 
-        databaseRef.setValue(userData)
+        databaseRef.child(email.replace(".", ",")).setValue(userData)
             .addOnSuccessListener {
-                Log.d("Firebase", "User Data Saved Successfully")
+                Log.d("Register", "User Registration Successful")
             }
             .addOnFailureListener { e ->
-                Log.e("Firebase", "Failed to Save Data", e)
+                Log.d("Register", "User Registration Successful")
             }
+
     }
 }

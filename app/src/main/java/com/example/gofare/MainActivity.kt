@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var toRegister : TextView
     lateinit var toResetPassword : TextView
-    lateinit var emailInput : EditText
+    lateinit var usernameInput : EditText
     lateinit var passwordInput : EditText
     lateinit var loginButton : MaterialButton
     lateinit var toggleVisibility : ImageButton
@@ -27,12 +27,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
         toRegister = findViewById(R.id.toRegister);
-        emailInput = findViewById(R.id.emailEditText);
+        usernameInput = findViewById(R.id.usernameEditText);
         passwordInput = findViewById(R.id.passwordEditText);
         toResetPassword = findViewById(R.id.forgotPassword);
         loginButton = findViewById(R.id.loginButton);
         toggleVisibility = findViewById(R.id.togglePasswordBtn);
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        if (currentUser != null) {
+            Toast.makeText(this, "Welcome Back ${currentUser.email}", Toast.LENGTH_LONG).show()
+            val intent = Intent(
+                this@MainActivity,
+                HomeActivity::class.java
+            )
+            startActivity(intent)
+        }
 
         toRegister.setOnClickListener(View.OnClickListener {
             val intent = Intent(
@@ -59,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         loginButton.setOnClickListener(View.OnClickListener {
-            val email = emailInput.text.toString().trim()
+            val email = usernameInput.text.toString().trim()
             val password = passwordInput.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
@@ -89,6 +100,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 } else {
                     Log.e("Firebase", "Login Failed", task.getException())
+                    Toast.makeText(this, "Log In Failed", Toast.LENGTH_SHORT).show()
                 }
             }
     }

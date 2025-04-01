@@ -1,3 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-</menu>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:weightSum="1">
+
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginHorizontal="8dp"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:drawableTop="@drawable/home_icon"
+        android:text="Home"
+        android:textSize="12sp"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:id="@+id/HomeButton"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginHorizontal="8dp"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:drawableTop="@drawable/wrench_icon"
+        android:text="Settings"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        app:cornerRadius="36dp"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:id="@+id/SettingsButton"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginHorizontal="8dp"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:drawableTop="@drawable/transaction_icon"
+        android:text="History"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        app:cornerRadius="36dp"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:orientation="vertical"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginHorizontal="8dp"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        android:drawableTop="@drawable/user_icon"
+        android:text="User"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        app:cornerRadius="36dp"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:orientation="vertical"/>
+</LinearLayout>
