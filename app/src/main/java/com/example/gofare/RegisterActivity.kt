@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.google.android.gms.common.internal.Objects
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -92,7 +93,6 @@ class RegisterActivity : AppCompatActivity() {
                             saveUserToDatabase(userId, firstName, lastName, middleName, age, address, gender, contactNumber, email, password)
                         }
                         Toast.makeText(this, "Registration Successful!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, MainActivity::class.java))
                     } else {
                         Toast.makeText(this, "Registration Failed: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }
@@ -102,8 +102,12 @@ class RegisterActivity : AppCompatActivity() {
     private fun saveUserToDatabase(userId: String, firstName: String, lastName: String, middleName: String, age: String, address: String, gender: String, contactNo : String, email : String, password : String) {
         val databaseRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
 
-        val normalizedPhone = contactNo.replace("+", "").replace("-", "").replace(" ", "")
-        val hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray())
+        val walletData = mapOf(
+            "balance" to 0,
+            "currency" to "PHP",
+            "status" to "default",
+            "loanedAmount" to 0
+        )
 
         val userData = mapOf(
             "firstName" to firstName,
@@ -112,16 +116,21 @@ class RegisterActivity : AppCompatActivity() {
             "age" to age,
             "address" to address,
             "gender" to gender,
-            "contactNumber" to normalizedPhone,
+            "rfid" to null,
+            "contactNumber" to contactNo,
             "email" to email,
-            "hashedPassword" to hashedPassword
+            "accountStatus" to "active",
+            "wallet" to walletData
         )
 
-        databaseRef.child(email.replace(".", ",")).setValue(userData)
+        databaseRef.setValue(userData)
             .addOnSuccessListener {
+                Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
                 Log.d("Register", "User Registration Successful")
+                startActivity(Intent(this, MainActivity::class.java))
             }
             .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
                 Log.d("Register", "User Registration Successful")
             }
 

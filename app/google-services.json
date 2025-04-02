@@ -13,7 +13,20 @@
           "package_name": "com.example.gofare"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "266381062474-f1ciffk6sgn5ph7bkfa5j78odaforg7f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gofare",
+            "certificate_hash": "3ac9a9fb327f5625554459998024e1b6bdf50801"
+          }
+        },
+        {
+          "client_id": "266381062474-dv3q0h3aknim5qllfgt852fio4vpr4l0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAJKXsZE6Gcd0rcyKccW4oJvuW9BiS3J4w"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "266381062474-dv3q0h3aknim5qllfgt852fio4vpr4l0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
