@@ -10,18 +10,19 @@
     android:background="@drawable/background_main"
     android:windowSoftInputMode="adjustResize">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <!-- Upper Layout (40%) -->
         <LinearLayout
+            android:id="@+id/linearLayout7"
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:gravity="center"
             android:orientation="horizontal"
-            >
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/imageView"
@@ -34,54 +35,53 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:fontFamily="@font/joan_regular"
-                android:text="@string/app_name"
                 android:layout_margin="4dp"
-                android:textSize="48sp"
-                android:textColor="@color/black"
+                android:fontFamily="@font/joan_regular"
+                android:gravity="center"
+                android:text="@string/app_name"
                 android:textAlignment="center"
+                android:textColor="@color/black"
                 android:textIsSelectable="false"
-                />
+                android:textSize="48sp" />
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
                 android:fontFamily="@font/joan_regular"
+                android:gravity="bottom"
                 android:text="by UF"
-                android:textSize="16sp"
                 android:textColor="@color/black"
                 android:textIsSelectable="false"
-                />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
         <!-- Lower Layout (40%) -->
         <LinearLayout
+            android:id="@+id/linearLayout5"
             android:layout_width="match_parent"
-            android:layout_height="1150dp"
+            android:layout_height="match_parent"
             android:layout_marginVertical="4dp"
             android:gravity="center"
-            >
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout7"
+            tools:layout_editor_absoluteX="-4dp">
 
             <LinearLayout
-                android:layout_width="350dp"
+                android:layout_width="364dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/custom_radius_a"
                 android:orientation="vertical"
-                android:paddingVertical="20dp"
                 android:paddingHorizontal="8dp"
-                >
+                android:paddingVertical="20dp"
+                tools:ignore="UselessParent">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:orientation="horizontal"
-                    android:gravity="center"
                     android:layout_marginVertical="8dp"
-                    >
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/toLogin"
@@ -89,12 +89,12 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_margin="4dp"
+                        android:backgroundTint="#9BCBE3"
+                        android:padding="0dp"
                         android:text="X"
+                        android:textAllCaps="false"
                         android:textColor="@color/black"
                         android:textSize="16sp"
-                        android:textAllCaps="false"
-                        android:padding="0dp"
-                        android:backgroundTint="#9BCBE3"
                         app:cornerRadius="24dp" />
 
                     <TextView
@@ -102,121 +102,124 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="9"
-                        android:textAlignment="center"
                         android:text="Welcome To GoFare"
-                        android:textColor="#1E1E1E"
-                        android:textSize="24sp"
-                        />
+                        android:textAlignment="center"
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
                 </LinearLayout>
 
                 <TextView
                     android:id="@+id/firstNameLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="First Name:" />
+                    android:text="First Name:"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/firstNameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
                     android:layout_marginBottom="20dp"
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
                     android:hint="Jose"
-                    />
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/lastNameLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Last Name:" />
+                    android:text="Last Name:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/lastNameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
-                    android:hint="Rizal"
                     android:layout_marginBottom="20dp"
-                    />
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="Rizal"
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/middleNameLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Middle Name:" />
+                    android:text="Middle Name:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/middleNameEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
-                    android:hint="Largo"
                     android:layout_marginBottom="20dp"
-                    />
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="Largo"
+                    android:textColor="@color/black"
+                    android:inputType="text"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/addressLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Address:" />
+                    android:text="Address:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/addressEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
-                    android:hint="example St. test Rd."
                     android:layout_marginBottom="20dp"
-                    />
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="example St. test Rd."
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/ageLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Age:" />
+                    android:text="Age:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/ageEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
-                    android:hint="18"
                     android:layout_marginBottom="20dp"
-                    />
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="18"
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/genderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Gender:" />
+                    android:text="Gender:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <RadioGroup
                     android:id="@+id/genderRadioGrp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:orientation="horizontal"
-                    >
+                    android:orientation="horizontal">
 
                     <RadioButton
                         android:id="@+id/maleRadio"
@@ -239,98 +242,100 @@
                     android:id="@+id/contactLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Contact Number:" />
+                    android:text="Contact Number:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/contactEditText"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
                     android:layout_marginBottom="20dp"
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
                     android:hint="+6391234567890"
-                    />
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/emailLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Email:" />
+                    android:text="Email:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/emailEditText"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
                     android:layout_marginBottom="20dp"
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
                     android:hint="user@gmail.com"
-                    />
-
+                    android:inputType="text"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
 
                 <TextView
                     android:id="@+id/passwordLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Password:" />
+                    android:text="Password:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/passwordEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:ems="10"
-                    android:inputType="textPassword"
-                    android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
-                    android:hint="userpassword"
                     android:layout_marginBottom="20dp"
-                    />
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="userpassword"
+                    android:textColor="@color/black"
+                    android:inputType="textPassword"
+                    android:paddingHorizontal="8dp" />
 
                 <TextView
                     android:id="@+id/confirmPasswordLabel"
                     android:layout_width="match_parent"
                     android:layout_height="24dp"
-                    android:textSize="16dp"
-                    android:text="Confirm Password:" />
+                    android:text="Confirm Password:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
 
                 <EditText
                     android:id="@+id/confirmPasswordEditText"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:ems="10"
-                    android:inputType="textPassword"
                     android:background="@drawable/textbox_stroke"
-                    android:paddingHorizontal="8dp"
+                    android:ems="10"
                     android:hint="userpassword"
-                    />
+                    android:inputType="textPassword"
+                    android:textColor="@color/black"
+                    android:paddingHorizontal="8dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="156dp"
-                    android:orientation="vertical"
                     android:gravity="center"
-                    >
+                    android:orientation="vertical">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/signUpBtn"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
+                        android:layout_height="48dp"
                         android:layout_margin="4dp"
+                        android:backgroundTint="#1E1E1E"
+                        android:padding="0dp"
                         android:text="Sign Up"
+                        android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="16sp"
-                        android:textAllCaps="false"
-                        android:padding="0dp"
-                        android:backgroundTint="#1E1E1E"
                         app:cornerRadius="16dp" />
 
                 </LinearLayout>
@@ -342,11 +347,15 @@
 
         <!-- Footer Layout (20%) -->
         <LinearLayout
+            android:id="@+id/linearLayout6"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_marginVertical="4dp"
             android:gravity="center"
-            >
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout5">
 
             <TextView
                 android:id="@+id/textView4"
@@ -355,9 +364,10 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="© Copyright By UF"
-                android:textSize="14sp"/>
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
         </LinearLayout>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
