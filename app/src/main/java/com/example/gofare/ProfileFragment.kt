@@ -10,7 +10,6 @@ import android.widget.Button
 import com.google.firebase.auth.FirebaseAuth
 
 class ProfileFragment : Fragment() {
-    private lateinit var logoutButton : Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,21 +20,6 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        logoutButton = view.findViewById(R.id.logoutButton)
-
-        logoutButton.setOnClickListener(View.OnClickListener {
-            logoutUser()
-        })
-    }
-
-    private fun logoutUser() {
-        FirebaseAuth.getInstance().signOut()
-
-        // Navigate to login activity
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
     }
 
 

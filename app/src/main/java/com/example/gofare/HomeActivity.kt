@@ -22,7 +22,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var HomeButton: ImageButton
     private lateinit var SettingsButton: ImageButton
     private lateinit var TransactionsButton: ImageButton
-    private lateinit var ProfileButton: ImageButton
 
     private lateinit var viewModel: SharedViewModel
 
@@ -50,7 +49,6 @@ class HomeActivity : AppCompatActivity() {
         HomeButton = findViewById(R.id.HomeButton)
         SettingsButton = findViewById(R.id.SettingsButton)
         TransactionsButton = findViewById(R.id.TransactionsButton)
-        ProfileButton = findViewById(R.id.ProfileButton)
 
         HomeButton.setOnClickListener {
             switchFragment(HomeFragment())
@@ -60,9 +58,6 @@ class HomeActivity : AppCompatActivity() {
         }
         TransactionsButton.setOnClickListener {
             switchFragment(TransactionsFragment())
-        }
-        ProfileButton.setOnClickListener {
-            switchFragment(ProfileFragment())
         }
     }
 
