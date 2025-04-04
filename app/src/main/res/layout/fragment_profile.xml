@@ -92,6 +92,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="First Name:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
@@ -114,6 +115,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="Middle Name:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
@@ -136,6 +138,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="Last Name:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
@@ -175,6 +178,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="Email:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
@@ -197,6 +201,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="Contact Number:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
@@ -219,6 +224,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="Address:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
@@ -240,21 +246,27 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="16dp"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+
+                        >
 
                         <RadioButton
                             android:id="@+id/maleRadio"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Male" />
+                            android:textColor="@color/black"
+                            android:text="Male"
+                            android:enabled="false"/>
 
                         <RadioButton
                             android:id="@+id/femaleRadio"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Female" />
+                            android:textColor="@color/black"
+                            android:text="Female"
+                            android:enabled="false"/>
 
                     </RadioGroup>
 
@@ -265,6 +277,7 @@
                         android:layout_height="24dp"
                         android:layout_marginHorizontal="16dp"
                         android:text="Age:"
+                        android:textColor="@color/black"
                         android:textSize="16dp" />
 
                     <EditText
