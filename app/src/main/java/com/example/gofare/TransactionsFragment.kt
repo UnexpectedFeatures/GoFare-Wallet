@@ -1,59 +1,91 @@
 package com.example.gofare
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TransactionsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TransactionsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var transactionAdapter: TransactionAdapter
+    private val transactionList = mutableListOf<Transaction>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_transactions, container, false)
+        val view = inflater.inflate(R.layout.fragment_transactions, container, false)
+
+        recyclerView = view.findViewById(R.id.rvTransaction)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        transactionAdapter = TransactionAdapter(transactionList)
+        recyclerView.adapter = transactionAdapter
+
+        fetchTransactionData()
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Transactions.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TransactionsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun fetchTransactionData() {
+        val auth = FirebaseAuth.getInstance()
+        val userId = auth.currentUser?.uid
+
+        if (userId != null) {
+            val userRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
+
+            userRef.child("rfid").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val rfid = snapshot.getValue(String::class.java)
+
+                    Log.d("TransactionFragment", "User RFID: $rfid")  // Log RFID
+
+                    if (rfid != null) {
+                        // Fix: Remove quotes around RFID value here
+                        val dbRef = FirebaseDatabase.getInstance().getReference("Transactions").child("09d00805").child("transaction1")
+                        Log.d("TransactionFragment", "Fetching transactions from path: $dbRef")
+
+
+                        dbRef.addValueEventListener(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    val transactionList = mutableListOf<Transaction>()
+                                    for (transactionSnapshot in snapshot.children) {
+                                        val transaction = transactionSnapshot.getValue(Transaction::class.java)
+                                        if (transaction != null) {
+                                            transactionList.add(transaction)
+                                            Log.d("TransactionFragment", "Added transaction: $transaction")
+                                        }
+                                    }
+                                    transactionAdapter.updateTransactions(transactionList)
+                                } else {
+                                    Log.d("TransactionFragment", "No transactions found.")
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                Log.d("Error", error.message)
+                            }
+                        })
+                    } else {
+                        Log.d("TransactionFragment", "RFID is null")
+                    }
                 }
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("Error", error.message)
+                }
+            })
+        }
     }
+
+
+
+
 }

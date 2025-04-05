@@ -116,7 +116,7 @@ class RegisterActivity : AppCompatActivity() {
             "age" to age,
             "address" to address,
             "gender" to gender,
-            "rfid" to null,
+            "rfid" to "",
             "contactNumber" to contactNo,
             "email" to email,
             "accountStatus" to "active",

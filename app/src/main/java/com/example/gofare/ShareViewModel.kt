@@ -10,8 +10,12 @@ import java.text.DecimalFormat
 
 class SharedViewModel : ViewModel() {
     private val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference")
-    private var databaseListener: ValueEventListener? = null
+    private val transactionRef = FirebaseDatabase.getInstance().getReference("Transactions")
 
+    private var userListener: ValueEventListener? = null
+    private var transactionListener: ValueEventListener? = null
+
+    // User Info
     private val _userName = MutableLiveData<String>()
     val userName: LiveData<String> get() = _userName
 
@@ -21,24 +25,34 @@ class SharedViewModel : ViewModel() {
     private val _walletCurrency = MutableLiveData<String>()
     val walletCurrency: LiveData<String> get() = _walletCurrency
 
+    // Transactions
+    private val _transactions = MutableLiveData<List<Transaction>>()
+    val transactions: LiveData<List<Transaction>> get() = _transactions
+
     fun observeUserData(userId: String) {
         val userRef = dbRef.child(userId)
 
         // Remove existing listener if any (to avoid duplicates)
-        databaseListener?.let { userRef.removeEventListener(it) }
+        userListener?.let { userRef.removeEventListener(it) }
 
-        databaseListener = userRef.addValueEventListener(object : ValueEventListener {
+        userListener = userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val firstName = snapshot.child("firstName").getValue(String::class.java) ?: "Unknown"
                     val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
                     val balance = snapshot.child("wallet/balance").getValue(Double::class.java) ?: 0.00
                     val currency = snapshot.child("wallet/currency").getValue(String::class.java) ?: "PHP"
-                    val decimalFormat = DecimalFormat("#,###.##")
-                    val formattedBalance = decimalFormat.format(balance)
+                    val rfid = snapshot.child("rfid").getValue(String::class.java) ?: ""
+
+                    val formattedBalance = DecimalFormat("#,###.##").format(balance)
+
                     _userName.value = "$firstName $lastName"
                     _walletBalance.value = formattedBalance
                     _walletCurrency.value = currency
+
+                    if (rfid.isNotEmpty()){
+                        loadTransactions(rfid)
+                    }
                 }
             }
 
@@ -48,8 +62,34 @@ class SharedViewModel : ViewModel() {
         })
     }
 
+    private fun loadTransactions(rfid: String) {
+        val cleanedRfid = rfid.replace("\"", "")
+
+        transactionListener?.let {
+            transactionRef.child(cleanedRfid).removeEventListener(it)
+        }
+
+        val userTransactionsRef = transactionRef.child(cleanedRfid)
+
+        transactionListener = userTransactionsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val transactionList = mutableListOf<Transaction>()
+                for (child in snapshot.children) {
+                    val transaction = child.getValue(Transaction::class.java)
+                    transaction?.let { transactionList.add(it) }
+                }
+                _transactions.value = transactionList
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("SharedViewModel", "Transaction Error: ${error.message}")
+            }
+        })
+    }
+
     override fun onCleared() {
         super.onCleared()
-        databaseListener?.let { dbRef.removeEventListener(it) }
+        userListener?.let { dbRef.removeEventListener(it) }
+        transactionListener?.let { transactionRef.removeEventListener(it) }
     }
 }
