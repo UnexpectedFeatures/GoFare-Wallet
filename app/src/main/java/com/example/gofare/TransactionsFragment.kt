@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -44,23 +45,23 @@ class TransactionsFragment : Fragment() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val rfid = snapshot.getValue(String::class.java)
 
-                    Log.d("TransactionFragment", "User RFID: $rfid")  // Log RFID
-
-                    if (rfid != null) {
+                    if (rfid.toString().isNotEmpty() && rfid != null) {
                         // Fix: Remove quotes around RFID value here
-                        val dbRef = FirebaseDatabase.getInstance().getReference("Transactions").child("09d00805").child("transaction1")
+                        val dbRef = FirebaseDatabase.getInstance().getReference("Transactions").child(rfid)
                         Log.d("TransactionFragment", "Fetching transactions from path: $dbRef")
-
 
                         dbRef.addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {
                                     val transactionList = mutableListOf<Transaction>()
                                     for (transactionSnapshot in snapshot.children) {
+                                        val transactionId = transactionSnapshot.key
                                         val transaction = transactionSnapshot.getValue(Transaction::class.java)
+
                                         if (transaction != null) {
-                                            transactionList.add(transaction)
-                                            Log.d("TransactionFragment", "Added transaction: $transaction")
+                                            val transactionWithId = transaction.copy(transactionId = transactionId)
+                                            transactionList.add(transactionWithId)
+                                            Log.d("TransactionFragment", "Added transaction: $transactionWithId")
                                         }
                                     }
                                     transactionAdapter.updateTransactions(transactionList)
@@ -75,6 +76,11 @@ class TransactionsFragment : Fragment() {
                         })
                     } else {
                         Log.d("TransactionFragment", "RFID is null")
+                        Toast.makeText(requireContext(), "User RFID Not Registered! Redirected to Home Page", Toast.LENGTH_SHORT).show()
+                        requireActivity().supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .commit()
+                        return
                     }
                 }
 

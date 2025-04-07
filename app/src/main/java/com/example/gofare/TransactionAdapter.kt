@@ -13,6 +13,9 @@ class TransactionAdapter(private val transactionList: MutableList<Transaction>) 
         val transactionId: TextView = itemView.findViewById(R.id.transactionId)
         val balance: TextView = itemView.findViewById(R.id.balance)
         val date: TextView = itemView.findViewById(R.id.date)
+        val pickUpTxt: TextView = itemView.findViewById(R.id.pickUp)
+        val dropOffTxt: TextView = itemView.findViewById(R.id.dropOff)
+        val total: TextView = itemView.findViewById(R.id.total)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -23,8 +26,11 @@ class TransactionAdapter(private val transactionList: MutableList<Transaction>) 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction = transactionList[position]
         holder.transactionId.text = transaction.transactionId ?: "No ID"
-        holder.balance.text = "Balance: ${transaction.balance}"
-        holder.date.text = "Date: ${transaction.date}"
+        holder.balance.text = "Balance: ${transaction.balance.toString()}"
+        holder.date.text = "Date: ${transaction.date.toString()}"
+        holder.pickUpTxt.text = "Pick Up: ${transaction.pickup.toString()}"
+        holder.dropOffTxt.text = "Drop Off: ${transaction.dropoff.toString()}"
+        holder.total.text = "Total: ${transaction.total.toString()}"
     }
 
     override fun getItemCount(): Int {
@@ -37,4 +43,5 @@ class TransactionAdapter(private val transactionList: MutableList<Transaction>) 
         transactionList.addAll(newTransactions) // Add new data
         notifyDataSetChanged() // Notify adapter about the change
     }
+
 }

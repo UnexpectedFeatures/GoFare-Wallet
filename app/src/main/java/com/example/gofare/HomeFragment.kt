@@ -37,7 +37,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun displayUserData() {
         val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
-        viewModel.userName.observe(viewLifecycleOwner) { name ->
+        viewModel.firstName.observe(viewLifecycleOwner) { name ->
             tvWelcome.text = "Welcome $name"
         }
 

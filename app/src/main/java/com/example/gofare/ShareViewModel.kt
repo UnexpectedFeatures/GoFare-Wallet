@@ -16,8 +16,35 @@ class SharedViewModel : ViewModel() {
     private var transactionListener: ValueEventListener? = null
 
     // User Info
-    private val _userName = MutableLiveData<String>()
-    val userName: LiveData<String> get() = _userName
+    private val _fullName = MutableLiveData<String>()
+    val fullName: LiveData<String> get() = _fullName
+
+    private val _firstName = MutableLiveData<String>()
+    val firstName: LiveData<String> get() = _firstName
+
+    private val _lastName = MutableLiveData<String>()
+    val lastName: LiveData<String> get() = _lastName
+
+    private val _middleName = MutableLiveData<String>()
+    val middleName: LiveData<String> get() = _middleName
+
+    private val _accountStatus = MutableLiveData<String>()
+    val accountStatus: LiveData<String> get() = _accountStatus
+
+    private val _address = MutableLiveData<String>()
+    val address: LiveData<String> get() = _address
+
+    private val _age = MutableLiveData<String>()
+    val age: LiveData<String> get() = _age
+
+    private val _contactNumber = MutableLiveData<String>()
+    val contactNumber: LiveData<String> get() = _contactNumber
+
+    private val _email = MutableLiveData<String>()
+    val email: LiveData<String> get() = _email
+
+    private val _gender = MutableLiveData<String>()
+    val gender: LiveData<String> get() = _gender
 
     private val _walletBalance = MutableLiveData<String>()
     val walletBalance: LiveData<String> get() = _walletBalance
@@ -38,15 +65,33 @@ class SharedViewModel : ViewModel() {
         userListener = userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val firstName = snapshot.child("firstName").getValue(String::class.java) ?: "Unknown"
-                    val lastName = snapshot.child("lastName").getValue(String::class.java) ?: ""
+                    val rfid = snapshot.child("rfid").getValue(String::class.java) ?: ""
+
+                    val firstName = snapshot.child("firstName").getValue(String::class.java)
+                    val lastName = snapshot.child("lastName").getValue(String::class.java)
+                    val middleName = snapshot.child("middleName").getValue(String::class.java)
+                    val accountStatus = snapshot.child("accountStatus").getValue(String::class.java)
+                    val address = snapshot.child("address").getValue(String::class.java)
+                    val age = snapshot.child("age").getValue(String::class.java)
+                    val contactNumber = snapshot.child("contactNumber").getValue(String::class.java)
+                    val email = snapshot.child("email").getValue(String::class.java)
+                    val gender = snapshot.child("gender").getValue(String::class.java)
                     val balance = snapshot.child("wallet/balance").getValue(Double::class.java) ?: 0.00
                     val currency = snapshot.child("wallet/currency").getValue(String::class.java) ?: "PHP"
-                    val rfid = snapshot.child("rfid").getValue(String::class.java) ?: ""
 
                     val formattedBalance = DecimalFormat("#,###.##").format(balance)
 
-                    _userName.value = "$firstName $lastName"
+                    _fullName.value = "$firstName ${middleName?.substring(0, 1)}. $lastName"
+                    _firstName.value = firstName ?: "Unknown"
+                    _lastName.value = lastName ?: "Unknown"
+                    _middleName.value = middleName ?: "Unknown"
+                    _accountStatus.value = accountStatus ?: "Unknown"
+                    _address.value = address ?: "Unknown"
+                    _age.value = age ?: "Unknown"
+                    _contactNumber.value = contactNumber ?: "Unknown"
+                    _email.value = email ?: "Unknown"
+                    _gender.value = gender ?: "Unknown"
+
                     _walletBalance.value = formattedBalance
                     _walletCurrency.value = currency
 

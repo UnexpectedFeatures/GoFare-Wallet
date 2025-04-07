@@ -7,11 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
 
 class SettingsFragment : Fragment() {
     private lateinit var logoutButton : com.google.android.material.button.MaterialButton
     private lateinit var editProfile : com.google.android.material.button.MaterialButton
+    private lateinit var stFullName : TextView
+    private lateinit var stEmail : TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,14 +33,32 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         logoutButton = view.findViewById(R.id.logoutButton)
         editProfile = view.findViewById(R.id.editProfileButton)
+        stFullName = view.findViewById(R.id.stFullName)
+        stEmail = view.findViewById(R.id.stEmail)
+
 
         editProfile.setOnClickListener {
             switchFragment(ProfileFragment())
         }
 
+
+
         logoutButton.setOnClickListener(View.OnClickListener {
             logoutUser()
         })
+        displayUserData()
+    }
+
+    private fun displayUserData() {
+        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+
+        viewModel.fullName.observe(viewLifecycleOwner) { name ->
+            stFullName.setText(name)
+        }
+        viewModel.email.observe(viewLifecycleOwner) {email ->
+            stEmail.setText(email)
+        }
+
     }
 
 

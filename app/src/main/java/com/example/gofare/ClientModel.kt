@@ -27,8 +27,8 @@ data class Transaction(
     val balance: Double = 0.0,
     val total: Double = 0.0,
     val remBalance: Double = 0.0,
-    val pickUp: String = "",
-    val dropOff: String = "",
+    val pickup: String = "",
+    val dropoff: String = "",
     val date: String = "",
     val time: String = ""
 )
