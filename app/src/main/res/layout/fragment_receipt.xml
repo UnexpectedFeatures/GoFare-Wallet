@@ -33,9 +33,10 @@
         <TextView
             android:id="@+id/transactionId"
             android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_height="64dp"
             android:gravity="center"
             android:text="Transaction ID"
+            android:textColor="@color/black"
             android:textSize="40sp"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -69,6 +70,7 @@
                     android:text="Pick Up:"
                     android:textSize="32sp"
                     android:textStyle="bold"
+                    android:textColor="@color/black"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/transactionId" />
 
@@ -78,6 +80,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:text="Destination 1"
                     android:textSize="24sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -102,6 +105,7 @@
                     android:text="Drop Off:"
                     android:textSize="32sp"
                     android:textStyle="bold"
+                    android:textColor="@color/black"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/transactionId" />
 
@@ -110,6 +114,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:textColor="@color/black"
                     android:gravity="center"
                     android:text="Destination 2"
                     android:textSize="24sp"
@@ -127,6 +132,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Loaned: True"
+            android:textColor="@color/black"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -139,6 +145,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Date: 01/24/2025"
+            android:textColor="@color/black"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -152,6 +159,7 @@
             android:gravity="center"
             android:text="Time: 9:32AM"
             android:textSize="24sp"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/date" />
@@ -177,6 +185,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:text="Balance:"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -189,6 +198,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:text="1000.00"
                     android:textSize="20sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -210,6 +220,7 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:textColor="@color/black"
                     android:text="Total"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -221,6 +232,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
+                    android:textColor="@color/black"
                     android:gravity="center"
                     android:text="13.00"
                     android:textSize="20sp"
@@ -248,6 +260,7 @@
                 android:gravity="center"
                 android:text="Remaining Balance:"
                 android:textSize="32sp"
+                android:textColor="@color/black"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/transactionId" />
@@ -258,6 +271,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:textColor="@color/black"
                 android:text="987.00"
                 android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
