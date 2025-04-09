@@ -11,24 +11,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <include layout="@layout/header_default" />
-    </LinearLayout>
+            <include layout="@layout/header_default" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="580dp"
+            android:layout_height="600dp"
             android:background="@drawable/background_main"
             android:gravity="center"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
@@ -196,18 +199,18 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textColor="@color/black"
                             android:buttonTint="@color/button_pressed"
-                            android:text="Light Mode" />
+                            android:text="Light Mode"
+                            android:textColor="@color/black" />
 
                         <RadioButton
                             android:id="@+id/darkRadio"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:textColor="@color/black"
                             android:buttonTint="@color/button_pressed"
-                            android:text="Dark Mode" />
+                            android:text="Dark Mode"
+                            android:textColor="@color/black" />
 
                     </RadioGroup>
 
@@ -227,9 +230,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="UseSwitchCompatOrMaterialXml"
                             app:thumbTint="@color/sky_blue"
-                            app:trackTint="@color/button_pressed" />
+                            app:trackTint="@color/button_pressed"
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
                         <TextView
                             android:id="@+id/stNotification"
@@ -255,9 +258,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/stNotification"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:ignore="UseSwitchCompatOrMaterialXml"
                             app:thumbTint="@color/sky_blue"
-                            app:trackTint="@color/button_pressed" />
+                            app:trackTint="@color/button_pressed"
+                            tools:ignore="UseSwitchCompatOrMaterialXml" />
 
                         <TextView
                             android:id="@+id/stVibrate"
@@ -293,7 +296,7 @@
                     android:gravity="center"
                     android:orientation="vertical"
                     android:paddingHorizontal="4dp"
-                    android:paddingVertical="4dp">
+                    android:paddingVertical="8dp">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/privacyButton"

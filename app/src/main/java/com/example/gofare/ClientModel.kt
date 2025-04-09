@@ -1,5 +1,8 @@
 package com.example.gofare
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 data class Clients(
     val firstName: String? = null,
     val lastName: String? = null,
@@ -20,6 +23,7 @@ data class Wallet(
     val status: String = "default"
 )
 
+@Parcelize
 data class Transaction(
     val transactionId: String? = null,
     val discount: Boolean = false,
@@ -31,4 +35,4 @@ data class Transaction(
     val dropoff: String = "",
     val date: String = "",
     val time: String = ""
-)
+): Parcelable

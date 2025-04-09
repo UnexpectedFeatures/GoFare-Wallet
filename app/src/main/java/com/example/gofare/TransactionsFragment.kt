@@ -26,7 +26,17 @@ class TransactionsFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.rvTransaction)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        transactionAdapter = TransactionAdapter(transactionList)
+        transactionAdapter = TransactionAdapter(transactionList, object : TransactionAdapter.OnItemClickListener {
+            override fun onTransactionClick(transaction: Transaction) {
+                // Optional: Pass data to ReceiptFragment using arguments or ViewModel
+                val receiptFragment = ReceiptFragment.newInstance(transaction)
+
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, receiptFragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        })
         recyclerView.adapter = transactionAdapter
 
         fetchTransactionData()
