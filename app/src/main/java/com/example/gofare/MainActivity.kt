@@ -51,6 +51,13 @@ class MainActivity : AppCompatActivity() {
                 RegisterActivity::class.java
             )
             startActivity(intent)
+        })
+        toResetPassword.setOnClickListener(View.OnClickListener {
+            val intent = Intent(
+                this@MainActivity,
+                ForgotPasswordActivity::class.java
+            )
+            startActivity(intent)
         });
 
         var isPasswordVisible = false

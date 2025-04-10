@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
 
@@ -15,6 +16,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var tvWelcome: TextView
     private lateinit var tvBalance: TextView
     private lateinit var tvCurrency: TextView
+    private lateinit var topUpBtn: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,7 +31,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         tvWelcome = view.findViewById(R.id.tvWelcome)
         tvBalance = view.findViewById(R.id.tvBalance)
         tvCurrency = view.findViewById(R.id.tvCurrency)
+        topUpBtn = view.findViewById(R.id.topUpBtn)
 
+        topUpBtn.setOnClickListener{
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, TopUpFragment())
+                .commit()
+        }
 
         displayUserData()
     }
@@ -57,7 +65,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 tvBalance.textSize = textSizeInPx / resources.displayMetrics.density
             }
 
-            tvBalance.text = "$balance"
+            tvBalance.text = balance.toString()
+
         }
 
 

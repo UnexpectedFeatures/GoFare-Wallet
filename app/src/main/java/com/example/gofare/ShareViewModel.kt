@@ -79,7 +79,7 @@ class SharedViewModel : ViewModel() {
                     val balance = snapshot.child("wallet/balance").getValue(Double::class.java) ?: 0.00
                     val currency = snapshot.child("wallet/currency").getValue(String::class.java) ?: "PHP"
 
-                    val formattedBalance = DecimalFormat("#,###.##").format(balance)
+                    val formattedBalance = DecimalFormat("#,###.00").format(balance)
 
                     _fullName.value = "$firstName ${middleName?.substring(0, 1)}. $lastName"
                     _firstName.value = firstName ?: "Unknown"
