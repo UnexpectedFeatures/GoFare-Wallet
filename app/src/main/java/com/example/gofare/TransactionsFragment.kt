@@ -108,6 +108,9 @@ class TransactionsFragment : Fragment() {
                         })
                     } else {
                         Toast.makeText(requireContext(), "User RFID Not Registered! Redirected to Home Page", Toast.LENGTH_SHORT).show()
+                        requireActivity().supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .commit()
                     }
                 }
 
@@ -127,6 +130,20 @@ class TransactionsFragment : Fragment() {
 
         // No need to check permission here, handle in the onRequestPermissionsResult method
         with(NotificationManagerCompat.from(requireContext())) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return
+            }
             notify(1, builder.build())
         }
     }
