@@ -56,13 +56,11 @@ class TopUpFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // 🛑 Show confirmation dialog
             val alertDialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Confirm Top-Up")
                 .setMessage("Are you sure you want to top up ₱$totalDeposit?")
                 .setPositiveButton("Yes") { _, _ ->
 
-                    // ✅ Proceed with top-up
                     val auth = FirebaseAuth.getInstance()
                     val userId = auth.currentUser?.uid
 

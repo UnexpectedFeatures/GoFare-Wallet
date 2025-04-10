@@ -1,22 +1,30 @@
 package com.example.gofare
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import android.Manifest
+
 
 class TransactionsFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var transactionAdapter: TransactionAdapter
     private val transactionList = mutableListOf<Transaction>()
+    private val previousTransactionIds = mutableSetOf<String>()  // To track previous transaction IDs
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,28 +63,42 @@ class TransactionsFragment : Fragment() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val rfid = snapshot.getValue(String::class.java)
 
-                    if (!rfid.isNullOrEmpty())  {
-                        // Fix: Remove quotes around RFID value here
+                    if (!rfid.isNullOrEmpty()) {
                         val dbRef = FirebaseDatabase.getInstance().getReference("Transactions").child(rfid)
                         Log.d("TransactionFragment", "Fetching transactions from path: $dbRef")
 
                         dbRef.addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {
-                                    val transactionList = mutableListOf<Transaction>()
+                                    val newList = mutableListOf<Transaction>()
+                                    val newTransactionIds = mutableSetOf<String>()
+
                                     for (transactionSnapshot in snapshot.children) {
                                         val transactionId = transactionSnapshot.key
                                         val transaction = transactionSnapshot.getValue(Transaction::class.java)
-
                                         if (transaction != null) {
                                             val transactionWithId = transaction.copy(transactionId = transactionId)
-                                            transactionList.add(transactionWithId)
-                                            Log.d("TransactionFragment", "Added transaction: $transactionWithId")
+                                            newList.add(transactionWithId)
+                                            newTransactionIds.add(transactionId ?: "")
                                         }
                                     }
+
+                                    // Compare new transaction IDs with the previous ones
+                                    val newTransactions = newTransactionIds.subtract(previousTransactionIds)
+
+                                    // If new transactions exist, notify
+                                    if (newTransactions.isNotEmpty()) {
+                                        sendNotification("New Transaction", "You have a new transaction.")
+                                    }
+
+                                    // Update previousTransactionIds to current ones
+                                    previousTransactionIds.clear()
+                                    previousTransactionIds.addAll(newTransactionIds)
+
+                                    // Update the transaction list and refresh adapter
+                                    transactionList.clear()
+                                    transactionList.addAll(newList)
                                     transactionAdapter.updateTransactions(transactionList)
-                                } else {
-                                    Log.d("TransactionFragment", "No transactions found.")
                                 }
                             }
 
@@ -101,7 +123,41 @@ class TransactionsFragment : Fragment() {
         }
     }
 
+    private fun sendNotification(title: String, message: String) {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+            }
+            return
+        }
 
+        val builder = NotificationCompat.Builder(requireContext(), "transaction_channel")
+            .setSmallIcon(R.drawable.go_fare_icon)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
+        with(NotificationManagerCompat.from(requireContext())) {
+            notify(1, builder.build())
+        }
+    }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permission granted, now send notification
+            sendNotification("Permission Granted", "You will now receive transaction alerts.")
+        } else {
+            Toast.makeText(requireContext(), "Notification permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
 }
