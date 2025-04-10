@@ -14,6 +14,9 @@ import com.google.firebase.auth.FirebaseAuth
 class SettingsFragment : Fragment() {
     private lateinit var logoutButton : com.google.android.material.button.MaterialButton
     private lateinit var editProfile : com.google.android.material.button.MaterialButton
+    private lateinit var contactButton : com.google.android.material.button.MaterialButton
+    private lateinit var privacyButton: com.google.android.material.button.MaterialButton
+    private lateinit var aboutButton: com.google.android.material.button.MaterialButton
     private lateinit var stFullName : TextView
     private lateinit var stEmail : TextView
 
@@ -35,13 +38,15 @@ class SettingsFragment : Fragment() {
         editProfile = view.findViewById(R.id.editProfileButton)
         stFullName = view.findViewById(R.id.stFullName)
         stEmail = view.findViewById(R.id.stEmail)
-
+        contactButton = view.findViewById(R.id.contactButton)
 
         editProfile.setOnClickListener {
             switchFragment(ProfileFragment())
         }
 
-
+        contactButton.setOnClickListener {
+            switchFragment(ContactFragment())
+        }
 
         logoutButton.setOnClickListener(View.OnClickListener {
             logoutUser()

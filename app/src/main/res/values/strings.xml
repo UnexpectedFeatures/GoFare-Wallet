@@ -1,5 +1,17 @@
 <resources>
     <string name="app_name">GoFare</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="requestType">
+        <item>Request</item>
+        <item>Complaint</item>
+        <item>Report</item>
+        <item>Others (Specify)</item>
+    </string-array>
+    <string-array name="requestReason">
+        <item>Missing RFID</item>
+        <item>Account Hacked</item>
+        <item>Account Loaning Suspension</item>
+        <item>Account Deposit Refund</item>
+        <item>Account Deletion</item>
+    </string-array>
 </resources>

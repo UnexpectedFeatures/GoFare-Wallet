@@ -30,7 +30,7 @@ data class Transaction(
     val loaned: Boolean = false,
     val balance: Double = 0.0,
     val total: Double = 0.0,
-    val remBalance: Double = 0.0,
+    val remainingBalance: Double = 0.0,
     val pickup: String = "",
     val dropoff: String = "",
     val date: String = "",

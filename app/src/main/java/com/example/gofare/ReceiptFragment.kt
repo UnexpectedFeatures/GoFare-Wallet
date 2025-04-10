@@ -74,7 +74,7 @@ class ReceiptFragment : Fragment() {
         time.text = "Time: " + transaction?.time
         balance.text = transaction?.balance.toString()
         total.text = transaction?.total.toString()
-        remainingBalance.text = transaction?.remBalance.toString()
+        remainingBalance.text = transaction?.remainingBalance.toString()
 
         return view
     }

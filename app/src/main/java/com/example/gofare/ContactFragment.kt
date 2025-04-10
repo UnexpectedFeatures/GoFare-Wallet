@@ -1,59 +1,150 @@
 package com.example.gofare
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import com.example.gofare.databinding.FragmentContactBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ContactFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ContactFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private  var _binding : FragmentContactBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var submitBtn : com.google.android.material.button.MaterialButton
+    private lateinit var backBtn : com.google.android.material.button.MaterialButton
+    private lateinit var typeMenu : com.google.android.material.textfield.TextInputLayout
+    private lateinit var reasonMenu : com.google.android.material.textfield.TextInputLayout
+    private lateinit var ctOtherType : EditText
+    private lateinit var specifyRequestLabel : TextView
+    private lateinit var ctDescription : EditText
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_contact, container, false)
+    ): View {
+
+        _binding = FragmentContactBinding.inflate(inflater, container, false)
+
+        val requestTypes = resources.getStringArray(R.array.requestType)
+        val requestReason = resources.getStringArray(R.array.requestReason)
+        val arrayAdapterType = ArrayAdapter(requireContext(), R.layout.request_item, requestTypes)
+        val arrayAdapterReason = ArrayAdapter(requireContext(), R.layout.reason_item, requestReason)
+        binding.typeAutoCompleteView.setAdapter(arrayAdapterType)
+        binding.reasonAutoCompleteView.setAdapter(arrayAdapterReason)
+
+        return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        submitBtn = view.findViewById(R.id.submitBtn)
+        backBtn = view.findViewById(R.id.backBtn)
+        typeMenu = view.findViewById(R.id.typeMenu)
+        reasonMenu = view.findViewById(R.id.reasonMenu)
+        ctOtherType = view.findViewById(R.id.ctOtherType)
+        ctDescription = view.findViewById(R.id.ctDescription)
+        specifyRequestLabel = view.findViewById(R.id.specifyRequestLabel)
+
+        ctOtherType.visibility = View.GONE
+        specifyRequestLabel.visibility = View.GONE
+
+        binding.typeAutoCompleteView.setOnItemClickListener { _, _, position, _ ->
+            val selected = binding.typeAutoCompleteView.adapter.getItem(position).toString()
+            Log.d("DropdownSelection", "Selected item: $selected")
+            ctOtherType.visibility = if (selected == "Others (Specify)") View.VISIBLE else View.GONE
+            specifyRequestLabel.visibility = if (selected == "Others (Specify)") View.VISIBLE else View.GONE
+        }
+
+        binding.reasonAutoCompleteView.setOnItemClickListener { _, _, position, _ ->
+            val selected = binding.reasonAutoCompleteView.adapter.getItem(position).toString()
+            Log.d("DropdownSelection", "Selected item: $selected")
+        }
+
+        backBtn.setOnClickListener {
+            switchFragment(SettingsFragment())
+        }
+
+        submitBtn.setOnClickListener {
+            createRequest()
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ContactFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ContactFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    fun switchFragment(fragment: Fragment) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
+
+    private fun createRequest() {
+        val auth = FirebaseAuth.getInstance()
+        val userId = auth.currentUser?.uid
+
+        val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        val currentTime = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
+
+        val case = binding.typeAutoCompleteView.text.toString()
+        val reason = binding.reasonAutoCompleteView.text.toString()
+        val otherType = ctOtherType.text.toString()
+        val description = ctDescription.text.toString()
+
+        if (case.isEmpty() ||  case == "Request" || reason.isEmpty() || reason == "Reason") {
+            Toast.makeText(requireContext(), "Please choose a case and a reason", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (userId != null){
+            val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
+            dbRef.child("rfid").get().addOnSuccessListener { snapshot ->
+                val rfid = snapshot.value.toString()
+
+                if (rfid.isNotEmpty()) {
+                    val requestRef = FirebaseDatabase.getInstance().getReference("ClientRequests").child(rfid)
+
+                    requestRef.get().addOnSuccessListener { snapshot ->
+                        val count = snapshot.childrenCount.toInt() + 1
+                        val requestId = "UR" + String.format("%04d", count)
+
+                        val requestMap = mapOf(
+                            "requestId" to requestId,
+                            "type" to case,
+                            "reason" to reason,
+                            "otherType" to if (case == "Others (Specify)") otherType else "",
+                            "description" to description,
+                            "date" to currentDate,
+                            "time" to currentTime,
+                            "status" to "Pending"
+                        )
+
+                        requestRef.push().setValue(requestMap).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(requireContext(), "Request Sent Successfully", Toast.LENGTH_SHORT).show()
+                                switchFragment(SettingsFragment())
+                            } else {
+                                Toast.makeText(requireContext(), "Request Sent Failure", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
             }
+        }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        _binding = null
+    }
+
 }

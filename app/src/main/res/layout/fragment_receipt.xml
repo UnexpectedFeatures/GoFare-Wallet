@@ -255,7 +255,7 @@
 
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="64dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Remaining Balance:"
@@ -268,7 +268,7 @@
             <TextView
                 android:id="@+id/remainingBalance"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="32dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:textColor="@color/black"

@@ -55,7 +55,7 @@ class TransactionsFragment : Fragment() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val rfid = snapshot.getValue(String::class.java)
 
-                    if (rfid.toString().isNotEmpty() && rfid != null) {
+                    if (!rfid.isNullOrEmpty())  {
                         // Fix: Remove quotes around RFID value here
                         val dbRef = FirebaseDatabase.getInstance().getReference("Transactions").child(rfid)
                         Log.d("TransactionFragment", "Fetching transactions from path: $dbRef")

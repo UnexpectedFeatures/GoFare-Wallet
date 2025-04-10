@@ -67,7 +67,7 @@ class ProfileFragment : Fragment() {
 
         editBtn.setOnClickListener{
             isEditing = true
-            setEnabled()
+            setEnabled(true)
             editBtn.visibility = View.GONE
             editLayout.visibility = View.VISIBLE
         }
@@ -75,14 +75,14 @@ class ProfileFragment : Fragment() {
         saveBtn.setOnClickListener{
             updateProfile()
             isEditing = false
-            setEnabled()
+            setEnabled(false)
             editBtn.visibility = View.VISIBLE
             editLayout.visibility = View.GONE
         }
 
         cancelBtn.setOnClickListener{
             isEditing = false
-            setEnabled()
+            setEnabled(false)
             editBtn.visibility = View.VISIBLE
             editLayout.visibility = View.GONE
         }
@@ -91,19 +91,16 @@ class ProfileFragment : Fragment() {
         displayUserData()
     }
 
-    private fun setEnabled(){
-        pfFirstName.isEnabled = isEditing
-        pfMiddleName.isEnabled = isEditing
-        pfLastName.isEnabled = isEditing
-        pfContactNumber.isEnabled = isEditing
-        pfAddress.isEnabled = isEditing
-        pfAge.isEnabled = isEditing
-        radioMale.isEnabled = isEditing
-        radioFemale.isEnabled = isEditing
-        saveBtn.isEnabled = isEditing
-        editBtn.isEnabled = isEditing
-        cancelBtn.isEnabled = isEditing
-        editLayout.isEnabled = isEditing
+    private fun setEnabled( arg: Boolean ){
+        pfFirstName.isEnabled = arg
+        pfMiddleName.isEnabled = arg
+        pfLastName.isEnabled = arg
+        pfContactNumber.isEnabled = arg
+        pfAddress.isEnabled = arg
+        pfAge.isEnabled = arg
+        radioMale.isEnabled = arg
+        radioFemale.isEnabled = arg
+        editLayout.isEnabled = arg
     }
 
     private fun updateProfile() {
