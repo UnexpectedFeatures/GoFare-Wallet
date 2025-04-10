@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import android.Manifest
+import androidx.core.content.ContextCompat
 
 
 class TransactionsFragment : Fragment() {
@@ -24,7 +25,7 @@ class TransactionsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var transactionAdapter: TransactionAdapter
     private val transactionList = mutableListOf<Transaction>()
-    private val previousTransactionIds = mutableSetOf<String>()  // To track previous transaction IDs
+    private val previousTransactionIds = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,7 +66,6 @@ class TransactionsFragment : Fragment() {
 
                     if (!rfid.isNullOrEmpty()) {
                         val dbRef = FirebaseDatabase.getInstance().getReference("Transactions").child(rfid)
-                        Log.d("TransactionFragment", "Fetching transactions from path: $dbRef")
 
                         dbRef.addValueEventListener(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
@@ -107,12 +107,7 @@ class TransactionsFragment : Fragment() {
                             }
                         })
                     } else {
-                        Log.d("TransactionFragment", "RFID is null")
                         Toast.makeText(requireContext(), "User RFID Not Registered! Redirected to Home Page", Toast.LENGTH_SHORT).show()
-                        requireActivity().supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, HomeFragment())
-                            .commit()
-                        return
                     }
                 }
 
@@ -124,28 +119,19 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun sendNotification(title: String, message: String) {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
-            }
-            return
-        }
-
         val builder = NotificationCompat.Builder(requireContext(), "transaction_channel")
             .setSmallIcon(R.drawable.go_fare_icon)
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
+        // No need to check permission here, handle in the onRequestPermissionsResult method
         with(NotificationManagerCompat.from(requireContext())) {
             notify(1, builder.build())
         }
     }
 
+    // Handle permission request result
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -154,10 +140,33 @@ class TransactionsFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permission granted, now send notification
             sendNotification("Permission Granted", "You will now receive transaction alerts.")
         } else {
             Toast.makeText(requireContext(), "Notification permission denied", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun checkAndRequestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            } else {
+                sendNotification("Permission Granted", "You will now receive transaction alerts.")
+            }
+        } else {
+            sendNotification("Permission Granted", "You will now receive transaction alerts.")
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        checkAndRequestPermission()
     }
 }
