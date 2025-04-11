@@ -123,6 +123,7 @@ class SharedViewModel : ViewModel() {
                     val transaction = child.getValue(Transaction::class.java)
                     transaction?.let { transactionList.add(it) }
                 }
+
                 _transactions.value = transactionList
             }
 

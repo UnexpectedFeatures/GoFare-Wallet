@@ -9,14 +9,24 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
+import com.google.type.DateTime
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
+
 
     private lateinit var tvWelcome: TextView
     private lateinit var tvBalance: TextView
     private lateinit var tvCurrency: TextView
     private lateinit var topUpBtn: ImageButton
+
+    private lateinit var transactionCount: TextView
+    private lateinit var pickup: TextView
+    private lateinit var dropoff: TextView
+    private lateinit var total: TextView
+    private lateinit var dateTime: TextView
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,13 +43,43 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         tvCurrency = view.findViewById(R.id.tvCurrency)
         topUpBtn = view.findViewById(R.id.topUpBtn)
 
+        transactionCount = view.findViewById(R.id.transactionCount)
+        pickup = view.findViewById(R.id.pickup)
+        dropoff = view.findViewById(R.id.dropoff)
+        total = view.findViewById(R.id.total)
+        dateTime = view.findViewById(R.id.dateTime)
+
         topUpBtn.setOnClickListener{
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, TopUpFragment())
                 .commit()
         }
 
+
         displayUserData()
+        displayOverview()
+    }
+
+    private fun displayOverview() {
+        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+
+        viewModel.transactions.observe(viewLifecycleOwner) { transactionsList ->
+            transactionCount.text = "Transactions: ${transactionsList.size}"
+
+            if (transactionsList.isNotEmpty()) {
+                val lastTransaction = transactionsList[transactionsList.size - 1]
+
+                pickup.text = "Pickup: ${lastTransaction.pickup ?: "Unknown"}"
+                dropoff.text = "Dropoff: ${lastTransaction.dropoff ?: "Unknown"}"
+                total.text = "Total: ₱${lastTransaction.total ?: "0.00"}"
+                dateTime.text = "Date: ${lastTransaction.date ?: "N/A"} | ${lastTransaction.time}"
+            } else {
+                pickup.text = "Pickup: -"
+                dropoff.text = "Dropoff: -"
+                total.text = "Total: -"
+                dateTime.text = "Date: -"
+            }
+        }
     }
 
     private fun displayUserData() {
