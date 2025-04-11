@@ -99,7 +99,7 @@ class ContactFragment : Fragment() {
         val otherType = ctOtherType.text.toString()
         val description = ctDescription.text.toString()
 
-        if (case.isEmpty() ||  case == "Request" || reason.isEmpty() || reason == "Reason") {
+        if (case.isEmpty() || reason.isEmpty() || reason == "Reason") {
             Toast.makeText(requireContext(), "Please choose a case and a reason", Toast.LENGTH_SHORT).show()
             return
         }

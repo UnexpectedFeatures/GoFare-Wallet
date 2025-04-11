@@ -3,6 +3,7 @@
     android:layout_height="wrap_content"
     android:text="TextView"
     android:textSize="20sp"
+    android:background="@color/white"
     android:textColor="@color/black"
     android:padding="12dp"
     xmlns:android="http://schemas.android.com/apk/res/android" />
