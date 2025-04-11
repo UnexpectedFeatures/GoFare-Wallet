@@ -27,7 +27,7 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SharedViewModel
 
-    private var lastNotifiedTransactionCount = 0 // <- Prevent spamming
+    private var lastKnownTransactions: List<Transaction>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,16 +41,15 @@ class HomeActivity : AppCompatActivity() {
         if (currentUserId != null) {
             viewModel.observeUserData(currentUserId)
 
-            // 🔔 Observe transactions globally
             viewModel.transactions.observe(this) { list ->
-                if (list.size > lastNotifiedTransactionCount) {
+                if (lastKnownTransactions != null && list != lastKnownTransactions) {
                     NotificationHelper.sendNotification(
                         this,
-                        "New Transactions",
-                        "Newly Added Transaction!"
+                        "Transactions Updated",
+                        "Your transactions have changed."
                     )
-                    lastNotifiedTransactionCount = list.size
                 }
+                lastKnownTransactions = list
             }
 
         } else {

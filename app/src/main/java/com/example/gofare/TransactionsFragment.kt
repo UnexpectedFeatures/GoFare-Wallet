@@ -83,8 +83,13 @@ class TransactionsFragment : Fragment() {
                                         }
                                     }
 
-                                    sendNotification("New Transaction", "You have a new transaction.")
+                                    // Compare new transaction IDs with the previous ones
+                                    val newTransactions = newTransactionIds.subtract(previousTransactionIds)
 
+                                    // If new transactions exist, notify
+                                    if (newTransactions.isNotEmpty()) {
+                                        sendNotification("New Transaction", "You have a new transaction.")
+                                    }
 
                                     // Update previousTransactionIds to current ones
                                     previousTransactionIds.clear()
