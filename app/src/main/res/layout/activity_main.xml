@@ -28,9 +28,9 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="24dp"
-            app:srcCompat="@drawable/go_fare_icon" />
+            android:layout_height="180dp"
+            android:padding="0dp"
+            app:srcCompat="@drawable/go_fare_v3" />
 
         <TextView
             android:id="@+id/textView"

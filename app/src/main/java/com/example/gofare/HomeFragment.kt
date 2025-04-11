@@ -14,7 +14,6 @@ import com.google.type.DateTime
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
-
     private lateinit var tvWelcome: TextView
     private lateinit var tvBalance: TextView
     private lateinit var tvCurrency: TextView
@@ -26,8 +25,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var total: TextView
     private lateinit var dateTime: TextView
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,7 +32,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         tvWelcome = view.findViewById(R.id.tvWelcome)
