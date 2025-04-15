@@ -66,7 +66,6 @@ class SettingsFragment : Fragment() {
 
     }
 
-
     fun switchFragment(fragment: Fragment) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)

@@ -7,32 +7,34 @@ data class Clients(
     val firstName: String? = null,
     val lastName: String? = null,
     val email: String? = null,
-    val age: String? = null,
+    val age: Int? = null,
+    val birthday: String? = null,
     val gender: String? = null,
     val contactNumber: String? = null,
     val address: String? = null,
-    val rfid: String? = null,
-    val wallet: Wallet? = null,
-    val accountStatus: String? = null
 )
 
 data class Wallet(
     val balance: Double = 0.0,
-    val currency: String = "PHP",
+    val currency: String? = null,
     val loanedAmount: Double = 0.0,
-    val status: String = "default"
+    val loaned: Boolean = false
+)
+
+data class RFID(
+    val rfid: String = ""
 )
 
 @Parcelize
 data class Transaction(
-    val transactionId: String? = null,
+    val currentBalance: Double = 0.0,
+    val dateTime: String = "4-13-2025 5:08 PM",
     val discount: Boolean = false,
+    val dropoff: String = "Vicas",
     val loaned: Boolean = false,
-    val balance: Double = 0.0,
-    val total: Double = 0.0,
-    val remainingBalance: Double = 0.0,
-    val pickup: String = "",
-    val dropoff: String = "",
-    val date: String = "",
-    val time: String = ""
+    val loanedAmount: Double = 0.0,
+    val pickup: String = "Kiko",
+    val remainingBalance: Double = 1000.0,
+    val totalAmount: Double = 13.0,
+    val transactionId: String = "TX-0125215"
 ): Parcelable

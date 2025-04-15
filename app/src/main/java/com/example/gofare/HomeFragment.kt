@@ -1,6 +1,7 @@
 package com.example.gofare
 
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -50,8 +51,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .replace(R.id.fragment_container, TopUpFragment())
                 .commit()
         }
-
-
         displayUserData()
         displayOverview()
     }
@@ -59,16 +58,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun displayOverview() {
         val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
+        viewModel.startLive()
+
         viewModel.transactions.observe(viewLifecycleOwner) { transactionsList ->
             transactionCount.text = "Transactions: ${transactionsList.size}"
-
             if (transactionsList.isNotEmpty()) {
                 val lastTransaction = transactionsList[transactionsList.size - 1]
-
                 pickup.text = "Pickup: ${lastTransaction.pickup ?: "Unknown"}"
                 dropoff.text = "Dropoff: ${lastTransaction.dropoff ?: "Unknown"}"
-                total.text = "Total: ₱${lastTransaction.total ?: "0.00"}"
-                dateTime.text = "Date: ${lastTransaction.date ?: "N/A"} | ${lastTransaction.time}"
+                total.text = "Total: ₱${lastTransaction.totalAmount ?: "0.00"}"
+                dateTime.text = "Date: ${lastTransaction.dateTime ?: "N/A"}"
             } else {
                 pickup.text = "Pickup: -"
                 dropoff.text = "Dropoff: -"
@@ -81,36 +80,22 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun displayUserData() {
         val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
+        viewModel.startLive()
+
         viewModel.firstName.observe(viewLifecycleOwner) { name ->
             tvWelcome.text = "Welcome $name"
         }
 
-        viewModel.walletBalance.observe(viewLifecycleOwner) { balance ->
-            if (balance.toString().length > 16) {
-                val textSizeInSp = 24f
-                val textSizeInPx = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_SP, textSizeInSp, resources.displayMetrics
-                )
-                tvBalance.textSize = textSizeInPx / resources.displayMetrics.density
-            }
-            else{
-                val textSizeInSp = 40f
-                val textSizeInPx = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_SP, textSizeInSp, resources.displayMetrics
-                )
-                tvBalance.textSize = textSizeInPx / resources.displayMetrics.density
-            }
-
-            tvBalance.text = balance.toString()
-
+        viewModel.balance.observe(viewLifecycleOwner) { balance ->
+            tvBalance.text = "₱$balance"
         }
 
-
-        viewModel.walletCurrency.observe(viewLifecycleOwner) { currency ->
-            tvCurrency.text = "$currency"
+        viewModel.currency.observe(viewLifecycleOwner) { currency ->
+            tvCurrency.text = currency ?: "PHP"
         }
-
     }
+
+
 
 
 }

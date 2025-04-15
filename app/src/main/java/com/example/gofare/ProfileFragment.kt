@@ -1,6 +1,8 @@
 package com.example.gofare
 
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.fragment.app.Fragment
@@ -14,20 +16,25 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.Visibility
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.Timestamp
 
 class ProfileFragment : Fragment() {
 
     var isEditing = false
 
     private lateinit var userProfile : TextView
+    private lateinit var ageText : TextView
     private lateinit var pfFirstName : EditText
     private lateinit var pfMiddleName : EditText
     private lateinit var pfLastName : EditText
     private lateinit var pfEmail : EditText
     private lateinit var pfContactNumber : EditText
     private lateinit var pfAddress : EditText
+    private lateinit var pfBirthday : EditText
     private lateinit var pfAge : EditText
     private lateinit var radioMale : RadioButton
     private lateinit var radioFemale : RadioButton
@@ -56,7 +63,9 @@ class ProfileFragment : Fragment() {
         pfEmail = view.findViewById(R.id.pfEmail)
         pfContactNumber = view.findViewById(R.id.pfContactNumber)
         pfAddress = view.findViewById(R.id.pfAddress)
+        pfBirthday = view.findViewById(R.id.pfBirthday)
         pfAge = view.findViewById(R.id.pfAge)
+        ageText = view.findViewById(R.id.ageLabel)
         pfGenderRadioGrp = view.findViewById(R.id.pfGenderRadioGrp)
         radioMale = view.findViewById(R.id.maleRadio)
         radioFemale = view.findViewById(R.id.femaleRadio)
@@ -68,6 +77,8 @@ class ProfileFragment : Fragment() {
         editBtn.setOnClickListener{
             isEditing = true
             setEnabled(true)
+            pfAge.visibility = View.GONE
+            ageText.visibility = View.GONE
             editBtn.visibility = View.GONE
             editLayout.visibility = View.VISIBLE
         }
@@ -76,6 +87,8 @@ class ProfileFragment : Fragment() {
             updateProfile()
             isEditing = false
             setEnabled(false)
+            pfAge.visibility = View.VISIBLE
+            ageText.visibility = View.VISIBLE
             editBtn.visibility = View.VISIBLE
             editLayout.visibility = View.GONE
         }
@@ -85,8 +98,25 @@ class ProfileFragment : Fragment() {
             setEnabled(false)
             editBtn.visibility = View.VISIBLE
             editLayout.visibility = View.GONE
+            displayUserData()
         }
 
+        pfBirthday.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(requireContext(),
+                { _, selectedYear, selectedMonth, selectedDay ->
+                    // Format and set the selected date
+                    val dateString = "${selectedMonth + 1}/$selectedDay/$selectedYear"
+                    pfBirthday.setText(dateString)
+                },
+                year, month, day)
+
+            datePickerDialog.show()
+        }
 
         displayUserData()
     }
@@ -97,7 +127,7 @@ class ProfileFragment : Fragment() {
         pfLastName.isEnabled = arg
         pfContactNumber.isEnabled = arg
         pfAddress.isEnabled = arg
-        pfAge.isEnabled = arg
+        pfBirthday.isEnabled = arg
         radioMale.isEnabled = arg
         radioFemale.isEnabled = arg
         editLayout.isEnabled = arg
@@ -108,14 +138,19 @@ class ProfileFragment : Fragment() {
         val userId = auth.currentUser?.uid
 
         if (userId != null){
-            val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
+            val dbRef = FirebaseFirestore.getInstance().collection("Users").document(userId)
 
             if (dbRef != null){
 
                 val firstName = pfFirstName.text.toString().trim()
                 val lastName = pfLastName.text.toString().trim()
                 val middleName = pfMiddleName.text.toString().trim()
-                val age = pfAge.text.toString().trim()
+                val birthday = pfBirthday.text.toString().trim()
+
+                val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+                val birthYear = birthday.substring(birthday.length - 4).toInt()
+
+                val age = currentYear - birthYear
                 val address = pfAddress.text.toString().trim()
                 val contactNumber = pfContactNumber.text.toString().replace("+", "").replace("-", "").replace(" ", "")
 
@@ -130,17 +165,19 @@ class ProfileFragment : Fragment() {
                     "firstName" to firstName,
                     "lastName" to lastName,
                     "middleName" to middleName,
+                    "birthday" to birthday,
                     "age" to age,
                     "address" to address,
                     "gender" to gender,
                     "contactNumber" to contactNumber,
+                    "updateDate" to Timestamp.now(),
                 )
 
-                if (firstName.isEmpty() || lastName.isEmpty() || age.isEmpty() || address.isEmpty() || gender.isEmpty() || contactNumber.isEmpty()) {
+                if (firstName.isEmpty() || lastName.isEmpty() || birthday.isEmpty() || address.isEmpty() || gender.isEmpty() || contactNumber.isEmpty()) {
                     Toast.makeText(requireContext(), "Please fill all required fields!", Toast.LENGTH_SHORT).show()
                 }
                 else{
-                    dbRef.updateChildren(userData)
+                    dbRef.update(userData)
                         .addOnSuccessListener {
                             Toast.makeText(requireContext(), "Profile updated successfully!", Toast.LENGTH_SHORT).show()
                         }
@@ -181,6 +218,9 @@ class ProfileFragment : Fragment() {
         }
         viewModel.address.observe(viewLifecycleOwner) { name ->
             pfAddress.setText(name)
+        }
+        viewModel.birthday.observe(viewLifecycleOwner) { name ->
+            pfBirthday.setText(name)
         }
         viewModel.age.observe(viewLifecycleOwner) { name ->
             pfAge.setText(name)

@@ -39,7 +39,7 @@ class HomeActivity : AppCompatActivity() {
         val currentUserId = auth.currentUser?.uid
 
         if (currentUserId != null) {
-            viewModel.observeUserData(currentUserId)
+            viewModel.observeUserData()
 
             viewModel.transactions.observe(this) { list ->
                 if (lastKnownTransactions != null && list != lastKnownTransactions) {

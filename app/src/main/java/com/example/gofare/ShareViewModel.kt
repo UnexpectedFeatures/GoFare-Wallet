@@ -5,17 +5,26 @@ import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.DecimalFormat
+import com.google.firebase.firestore.CollectionReference
+
 
 class SharedViewModel : ViewModel() {
-    private val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference")
-    private val transactionRef = FirebaseDatabase.getInstance().getReference("Transactions")
+    private val auth = FirebaseAuth.getInstance()
+    private val userId = auth.currentUser?.uid
 
-    private var userListener: ValueEventListener? = null
+    private val usersRef = FirebaseFirestore.getInstance().collection("Users")
+    private val walletRef = FirebaseFirestore.getInstance().collection("UserWallet")
+    private val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID")
+    private val transactionRef = FirebaseFirestore.getInstance().collection("UserTransaction")
+
+    private var usersListener: ValueEventListener? = null
     private var transactionListener: ValueEventListener? = null
 
-    // User Info
+    // User Data
     private val _fullName = MutableLiveData<String>()
     val fullName: LiveData<String> get() = _fullName
 
@@ -28,14 +37,14 @@ class SharedViewModel : ViewModel() {
     private val _middleName = MutableLiveData<String>()
     val middleName: LiveData<String> get() = _middleName
 
-    private val _accountStatus = MutableLiveData<String>()
-    val accountStatus: LiveData<String> get() = _accountStatus
-
     private val _address = MutableLiveData<String>()
     val address: LiveData<String> get() = _address
 
     private val _age = MutableLiveData<String>()
     val age: LiveData<String> get() = _age
+
+    private val _birthday = MutableLiveData<String>()
+    val birthday: LiveData<String> get() = _birthday
 
     private val _contactNumber = MutableLiveData<String>()
     val contactNumber: LiveData<String> get() = _contactNumber
@@ -46,96 +55,176 @@ class SharedViewModel : ViewModel() {
     private val _gender = MutableLiveData<String>()
     val gender: LiveData<String> get() = _gender
 
-    private val _walletBalance = MutableLiveData<String>()
-    val walletBalance: LiveData<String> get() = _walletBalance
+    // User Wallet
+    private val _balance = MutableLiveData<String>()
+    val balance: LiveData<String> get() = _balance
 
-    private val _walletCurrency = MutableLiveData<String>()
-    val walletCurrency: LiveData<String> get() = _walletCurrency
+    private val _currency = MutableLiveData<String>()
+    val currency: LiveData<String> get() = _currency
 
-    // Transactions
+    private val _loaned = MutableLiveData<String>()
+    val loaned: LiveData<String> get() = _loaned
+
+    private val _loanedAmount = MutableLiveData<String>()
+    val loanedAmount: LiveData<String> get() = _loanedAmount
+
+    // User Transactions
     private val _transactions = MutableLiveData<List<Transaction>>()
     val transactions: LiveData<List<Transaction>> get() = _transactions
 
-    fun observeUserData(userId: String) {
-        val userRef = dbRef.child(userId)
+    // Current User RFID
+    private val _rfid = MutableLiveData<String>()
+    val rfid: LiveData<String> get() = _rfid
 
-        // Remove existing listener if any (to avoid duplicates)
-        userListener?.let { userRef.removeEventListener(it) }
-
-        userListener = userRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val rfid = snapshot.child("rfid").getValue(String::class.java) ?: ""
-
-                    val firstName = snapshot.child("firstName").getValue(String::class.java)
-                    val lastName = snapshot.child("lastName").getValue(String::class.java)
-                    val middleName = snapshot.child("middleName").getValue(String::class.java)
-                    val accountStatus = snapshot.child("accountStatus").getValue(String::class.java)
-                    val address = snapshot.child("address").getValue(String::class.java)
-                    val age = snapshot.child("age").getValue(String::class.java)
-                    val contactNumber = snapshot.child("contactNumber").getValue(String::class.java)
-                    val email = snapshot.child("email").getValue(String::class.java)
-                    val gender = snapshot.child("gender").getValue(String::class.java)
-                    val balance = snapshot.child("wallet/balance").getValue(Double::class.java) ?: 0.00
-                    val currency = snapshot.child("wallet/currency").getValue(String::class.java) ?: "PHP"
-
-                    val formattedBalance = DecimalFormat("#,###.00").format(balance)
-
-                    _fullName.value = "$firstName ${middleName?.substring(0, 1)}. $lastName"
-                    _firstName.value = firstName ?: "Unknown"
-                    _lastName.value = lastName ?: "Unknown"
-                    _middleName.value = middleName ?: "Unknown"
-                    _accountStatus.value = accountStatus ?: "Unknown"
-                    _address.value = address ?: "Unknown"
-                    _age.value = age ?: "Unknown"
-                    _contactNumber.value = contactNumber ?: "Unknown"
-                    _email.value = email ?: "Unknown"
-                    _gender.value = gender ?: "Unknown"
-
-                    _walletBalance.value = formattedBalance
-                    _walletCurrency.value = currency
-
-                    if (rfid.isNotEmpty()){
-                        loadTransactions(rfid)
-                    }
+    fun startLive() {
+        if (userId != null) {
+            val userRFID = rfidRef.document(userId)
+            userRFID.addSnapshotListener { document, error ->
+                if (error != null) {
+                    Log.e("FirebaseData", "Error listening to user data", error)
+                    return@addSnapshotListener
+                }
+                if (document != null && document.exists()) {
+                    _rfid.value = document.getString("rfid") ?: ""
+                    Log.d("FirebaseData", "RFID has been set successfully")
+                } else {
+                    Log.d("FirebaseData", "User document does not exist")
                 }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("Error Database", error.toString())
-            }
-        })
-    }
-
-    private fun loadTransactions(rfid: String) {
-        val cleanedRfid = rfid.replace("\"", "")
-
-        transactionListener?.let {
-            transactionRef.child(cleanedRfid).removeEventListener(it)
+            observeUserData()
+            observeUserTransactions()
+            obeserveUserWallet()
         }
-
-        val userTransactionsRef = transactionRef.child(cleanedRfid)
-
-        transactionListener = userTransactionsRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val transactionList = mutableListOf<Transaction>()
-                for (child in snapshot.children) {
-                    val transaction = child.getValue(Transaction::class.java)
-                    transaction?.let { transactionList.add(it) }
-                }
-
-                _transactions.value = transactionList
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("SharedViewModel", "Transaction Error: ${error.message}")
-            }
-        })
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        userListener?.let { dbRef.removeEventListener(it) }
-        transactionListener?.let { transactionRef.removeEventListener(it) }
+    fun observeUserData() {
+        if (userId != null) {
+            Log.d("User Logged: ", userId)
+            val userRef = usersRef.document(userId)
+            userRef.addSnapshotListener { document, error ->
+                if (error != null) {
+                    Log.e("FirebaseData", "Error listening to user data", error)
+                    return@addSnapshotListener
+                }
+
+                if (document != null && document.exists()) {
+                    _firstName.value = document.getString("firstName") ?: ""
+                    _lastName.value = document.getString("lastName") ?: ""
+                    _middleName.value = document.getString("middleName") ?: ""
+                    _fullName.value = "${_firstName.value} ${_middleName.value} ${_lastName.value}".trim()
+                    _address.value = document.getString("address") ?: ""
+                    _age.value = document.getLong("age")?.toString() ?: ""
+                    _birthday.value = document.getString("birthday") ?: ""
+                    _contactNumber.value = document.getString("contactNumber") ?: ""
+                    _email.value = document.getString("email") ?: ""
+                    _gender.value = document.getString("gender") ?: ""
+
+                    Log.d("FirebaseData", "User data updated successfully")
+                } else {
+                    Log.d("FirebaseData", "User document does not exist")
+                }
+            }
+        }
+    }
+
+    fun obeserveUserWallet() {
+        if (userId != null) {
+            val userRFID = rfidRef.document(userId)
+            userRFID.addSnapshotListener { document, error ->
+                if (error != null) {
+                    Log.e("FirebaseData", "Error listening to user data", error)
+                    return@addSnapshotListener
+                }
+                if (document != null && document.exists()) {
+
+                    val rfid = document.getString("rfid")
+                    val walletsRef = walletRef.document(rfid.toString())
+
+                    walletsRef.addSnapshotListener { document, error ->
+                        if (error != null) {
+                            Log.e("FirebaseData", "Error listening to wallet data", error)
+                            return@addSnapshotListener
+                        }
+
+                        if (document != null && document.exists()) {
+                            val balance = document.getDouble("balance") ?: 0.0
+                            val loanedAmount = document.getDouble("balance") ?: 0.0
+
+                            _balance.value = DecimalFormat("#,##0.00").format(balance)
+                            _loanedAmount.value = DecimalFormat("#,##0.00").format(loanedAmount)
+                            _currency.value = document.getString("currency")
+                            _loaned.value = document.getBoolean("loaned").toString()
+
+                            Log.d("FirebaseData", "Wallet balance updated")
+                        } else {
+                            Log.d("FirebaseData", "Wallet document does not exist")
+                        }
+                    }
+
+
+                    Log.d("FirebaseData", "User data updated successfully")
+                } else {
+                    Log.d("FirebaseData", "User document does not exist")
+                }
+            }
+        }
+    }
+
+    fun observeUserTransactions() {
+        if (userId != null) {
+            val userRFID = rfidRef.document(userId)
+            userRFID.addSnapshotListener { document, error ->
+                if (error != null) {
+                    Log.e("FirebaseData", "Error listening to user data", error)
+                    return@addSnapshotListener
+                }
+                if (document != null && document.exists()) {
+
+                    val rfid = document.getString("rfid")
+
+                    transactionRef.document(rfid.toString()).addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            Log.e("FirebaseData", "Error fetching user transactions", error)
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null && snapshot.exists()) {
+                            val allTransactions = mutableListOf<Transaction>()
+
+                            for ((transactionId, value) in snapshot.data ?: emptyMap()) {
+                                val data = value as? Map<*, *> ?: continue
+
+                                val transaction = Transaction(
+                                    transactionId = transactionId,
+                                    pickup = data["pickup"] as? String ?: "",
+                                    dropoff = data["dropoff"] as? String ?: "",
+                                    currentBalance = (data["currentBalance"] as? Number)?.toDouble() ?: 0.0,
+                                    remainingBalance = (data["remainingBalance"] as? Number)?.toDouble() ?: 0.0,
+                                    totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
+                                    discount = data["discount"] as? Boolean ?: false,
+                                    loaned = data["loaned"] as? Boolean ?: false,
+                                    loanedAmount = (data["loanedAmount"] as? Number)?.toDouble() ?: 0.0,
+                                    dateTime = data["dateTime"] as? String ?: ""
+                                )
+
+                                allTransactions.add(transaction)
+                            }
+
+                            _transactions.value = allTransactions
+                            Log.d("FirebaseData", "Observed ${allTransactions.size} transactions.")
+                        } else {
+                            Log.d("FirebaseData", "Document doesn't exist for userId: $userId")
+                        }
+                    }
+
+                    Log.d("FirebaseData", "User Transactions updated successfully")
+                } else {
+                    Log.d("FirebaseData", "User document does not exist")
+                }
+            }
+        } else {
+            Log.d("FirebaseData", "User ID is null")
+        }
     }
 }

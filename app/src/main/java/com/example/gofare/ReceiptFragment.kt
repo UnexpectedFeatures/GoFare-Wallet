@@ -70,10 +70,10 @@ class ReceiptFragment : Fragment() {
         pickup.text = transaction?.pickup
         dropoff.text = transaction?.dropoff
         loaned.text = "Loaned: " + transaction?.loaned.toString()
-        date.text = "Date: " + transaction?.date
-        time.text = "Time: " + transaction?.time
-        balance.text = transaction?.balance.toString()
-        total.text = transaction?.total.toString()
+        date.text = "Date: " + transaction?.dateTime
+        time.text = "Time: " + transaction?.dateTime
+        balance.text = transaction?.currentBalance.toString()
+        total.text = transaction?.totalAmount.toString()
         remainingBalance.text = transaction?.remainingBalance.toString()
 
         return view
