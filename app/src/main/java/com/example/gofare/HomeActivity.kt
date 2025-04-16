@@ -62,6 +62,13 @@ class HomeActivity : AppCompatActivity() {
                 .commit()
         }
 
+        if (viewModel.rfid == null || viewModel.rfid.toString().isEmpty()){
+            TransactionsButton.visibility = View.GONE
+        }
+        else{
+            View.VISIBLE
+        }
+
         HomeButton = findViewById(R.id.HomeButton)
         SettingsButton = findViewById(R.id.SettingsButton)
         TransactionsButton = findViewById(R.id.TransactionsButton)
@@ -69,6 +76,8 @@ class HomeActivity : AppCompatActivity() {
         HomeButton.setOnClickListener { switchFragment(HomeFragment()) }
         SettingsButton.setOnClickListener { switchFragment(SettingsFragment()) }
         TransactionsButton.setOnClickListener { switchFragment(TransactionsFragment()) }
+
+
 
         // Request notification permission if needed
         requestNotificationPermission()

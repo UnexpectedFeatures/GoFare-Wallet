@@ -1,46 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/white"
-    android:gravity="center"
+    android:gravity="center|start"
     android:orientation="horizontal"
     android:paddingHorizontal="8dp"
     tools:context=".HomeActivity"
     >
 
+    <ImageButton
+        android:id="@+id/TransactionsButton"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:layout_weight="1"
+        android:background="@drawable/ripple_white"
+        android:src="@drawable/transaction_icon"
+        android:visibility="visible" />
 
     <ImageButton
         android:id="@+id/HomeButton"
-        android:layout_width="72dp"
+        android:layout_width="0dp"
         android:layout_height="72dp"
+        android:layout_weight="1"
         android:background="@drawable/ripple_white"
-        android:src="@drawable/home_icon"
-        app:layout_constraintEnd_toStartOf="@+id/SettingsButton"
-        app:layout_constraintStart_toEndOf="@+id/TransactionsButton"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:src="@drawable/home_icon" />
 
     <ImageButton
         android:id="@+id/SettingsButton"
-        android:layout_width="72dp"
+        android:layout_width="0dp"
         android:layout_height="72dp"
-        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
         android:background="@drawable/ripple_white"
-        android:src="@drawable/wrench_icon"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:src="@drawable/wrench_icon"/>
 
-    <ImageButton
-        android:id="@+id/TransactionsButton"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_marginStart="16dp"
-        android:background="@drawable/ripple_white"
-        android:src="@drawable/transaction_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
