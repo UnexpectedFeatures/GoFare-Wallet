@@ -2,6 +2,7 @@ package com.example.gofare
 
 import android.os.Bundle
 import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,10 +13,10 @@ import com.google.android.material.button.MaterialButton
 class PinActivity : AppCompatActivity() {
 
     lateinit var binding : ActivityPinBinding
-    lateinit var pin1 : EditText
-    lateinit var pin2 : EditText
-    lateinit var pin3 : EditText
-    lateinit var pin4 : EditText
+    lateinit var pin1 : TextView
+    lateinit var pin2 : TextView
+    lateinit var pin3 : TextView
+    lateinit var pin4 : TextView
 
     lateinit var btn1 : com.google.android.material.button.MaterialButton
     lateinit var btn2 : com.google.android.material.button.MaterialButton
@@ -43,8 +44,19 @@ class PinActivity : AppCompatActivity() {
         val buttons = listOf(
             binding.btn0, binding.btn1, binding.btn2,
             binding.btn3, binding.btn4, binding.btn5,
-            binding.btn6, binding.btn7, binding.btn8, binding.btn9
+            binding.btn6, binding.btn7, binding.btn8,
+            binding.btn9
         )
+
+        binding.btnDel.setOnClickListener {
+            for (i in pinFields.size - 1 downTo 0) {
+                if (pinFields[i].text.isNotEmpty()) {
+                    pinFields[i].setText("")
+                    pinFields[i].requestFocus()
+                    break
+                }
+            }
+        }
 
         pinFields[0].isFocusable = true
         pinFields[0].isFocusableInTouchMode = true
@@ -54,7 +66,7 @@ class PinActivity : AppCompatActivity() {
         }
     }
 
-    private fun assignId(btn: MaterialButton, pinFields: List<EditText>) {
+    private fun assignId(btn: MaterialButton, pinFields: List<TextView>) {
         btn.setOnClickListener {
             val digit = btn.text.toString()
 
