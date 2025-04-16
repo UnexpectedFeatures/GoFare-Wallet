@@ -60,7 +60,8 @@ class MainActivity : AppCompatActivity() {
         toResetPassword.setOnClickListener(View.OnClickListener {
             val intent = Intent(
                 this@MainActivity,
-                ForgotPasswordActivity::class.java
+//                ForgotPasswordActivity::class.java
+                PinActivity::class.java
             )
             startActivity(intent)
         });
