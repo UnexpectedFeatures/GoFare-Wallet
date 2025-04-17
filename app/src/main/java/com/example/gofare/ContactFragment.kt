@@ -1,5 +1,6 @@
 package com.example.gofare
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,6 +14,8 @@ import android.widget.Toast
 import com.example.gofare.databinding.FragmentContactBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -87,6 +90,7 @@ class ContactFragment : Fragment() {
             .commit()
     }
 
+    @SuppressLint("DefaultLocale")
     private fun createRequest() {
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
@@ -104,39 +108,38 @@ class ContactFragment : Fragment() {
             return
         }
 
-        if (userId != null){
-            val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
-            dbRef.child("rfid").get().addOnSuccessListener { snapshot ->
-                val rfid = snapshot.value.toString()
+        if (userId != null) {
+            val requestRef = FirebaseFirestore.getInstance()
+                .collection("UserRequests")
+                .document(userId)
 
-                if (rfid.isNotEmpty()) {
-                    val requestRef = FirebaseDatabase.getInstance().getReference("ClientRequests").child(rfid)
+            requestRef.get().addOnSuccessListener { snapshot ->
+                val existingRequests = snapshot.data ?: emptyMap<String, Any>()
+                val count = existingRequests.size
+                val requestId = "UR" + String.format("%04d", count + 1)
 
-                    requestRef.get().addOnSuccessListener { snapshot ->
-                        val count = snapshot.childrenCount.toInt() + 1
-                        val requestId = "UR" + String.format("%04d", count)
+                val requestMap = mapOf(
+                    "requestId" to requestId,
+                    "type" to case,
+                    "reason" to reason,
+                    "otherType" to if (case == "Others (Specify)") otherType else "",
+                    "description" to description,
+                    "date" to currentDate,
+                    "time" to currentTime,
+                    "status" to "Pending"
+                )
 
-                        val requestMap = mapOf(
-                            "requestId" to requestId,
-                            "type" to case,
-                            "reason" to reason,
-                            "otherType" to if (case == "Others (Specify)") otherType else "",
-                            "description" to description,
-                            "date" to currentDate,
-                            "time" to currentTime,
-                            "status" to "Pending"
-                        )
+                val updateMap = mapOf(requestId to requestMap)
 
-                        requestRef.push().setValue(requestMap).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Toast.makeText(requireContext(), "Request Sent Successfully", Toast.LENGTH_SHORT).show()
-                                switchFragment(SettingsFragment())
-                            } else {
-                                Toast.makeText(requireContext(), "Request Sent Failure", Toast.LENGTH_SHORT).show()
-                            }
+                requestRef.set(updateMap, SetOptions.merge())
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(requireContext(), "Request Sent Successfully", Toast.LENGTH_SHORT).show()
+                            switchFragment(SettingsFragment())
+                        } else {
+                            Toast.makeText(requireContext(), "Request Sending Failed", Toast.LENGTH_SHORT).show()
                         }
                     }
-                }
             }
         }
     }
