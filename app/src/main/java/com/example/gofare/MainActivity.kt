@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Welcome Back ${currentUser.email}", Toast.LENGTH_LONG).show()
             val intent = Intent(
                 this@MainActivity,
-                HomeActivity::class.java
+                PinActivity::class.java
             )
             startActivity(intent)
         }
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Firebase", "Login Successful")
                     val intent = Intent(
                         this@MainActivity,
-                        HomeActivity::class.java
+                        PinActivity::class.java
                     )
                     startActivity(intent)
                 } else {

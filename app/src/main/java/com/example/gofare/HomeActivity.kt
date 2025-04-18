@@ -78,7 +78,6 @@ class HomeActivity : AppCompatActivity() {
         TransactionsButton.setOnClickListener { switchFragment(TransactionsFragment()) }
 
 
-
         // Request notification permission if needed
         requestNotificationPermission()
     }
