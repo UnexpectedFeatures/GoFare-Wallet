@@ -138,6 +138,7 @@ class RegisterFragment : Fragment() {
                                     putString("password", password)
                                 }
 
+
                                 val registerEmailFragment = RegisterEmailFragment()
                                 registerEmailFragment.arguments = bundle
 

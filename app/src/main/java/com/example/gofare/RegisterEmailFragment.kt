@@ -56,27 +56,14 @@ class RegisterEmailFragment : Fragment() {
                 user?.reload()?.addOnSuccessListener {
                     if (user.isEmailVerified && !isVerified) {
                         isVerified = true
-                        val userId = user.uid
 
-                        val firstName = arguments?.getString("firstName") ?: ""
-                        val lastName = arguments?.getString("lastName") ?: ""
-                        val middleName = arguments?.getString("middleName") ?: ""
-                        val birthday = arguments?.getString("birthday") ?: ""
-                        val age = arguments?.getInt("age") ?: 0
-                        val address = arguments?.getString("address") ?: ""
-                        val gender = arguments?.getString("gender") ?: ""
-                        val contact = arguments?.getString("contact") ?: ""
-                        val email = arguments?.getString("email") ?: ""
-                        val password = arguments?.getString("password") ?: ""
+                        val mpinFragment = MPinRegisterFragment()
+                        mpinFragment.arguments = arguments
 
-                        saveUserToDatabase(userId, firstName, lastName, middleName, birthday, age, address, gender, contact, email, password)
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.register_frame, mpinFragment)
+                            .commit()
 
-                        val intent = Intent(
-                            requireContext(),
-                            HomeActivity::class.java
-                        )
-
-                        startActivity(intent)
                     } else {
                         handler.postDelayed(this, 3000) // try again in 3 seconds
                     }
@@ -94,53 +81,5 @@ class RegisterEmailFragment : Fragment() {
         }
     }
 
-    private fun saveUserToDatabase(userId: String, firstName: String, lastName: String, middleName: String, birthday: String, age: Int, address: String, gender: String, contactNo: String, email: String, password: String) {
-        val db = FirebaseFirestore.getInstance()
-        val userRef = db.collection("Users").document(userId)
-        val walletRef = db.collection("UserWallet").document(userId)
-        val rfidRef = db.collection("UserRFID").document(userId)
-        val transactionsRef = db.collection("UserTransaction").document(userId)
 
-        val userData = mapOf(
-            "firstName" to firstName,
-            "lastName" to lastName,
-            "middleName" to middleName,
-            "age" to age,
-            "birthday" to birthday,
-            "address" to address,
-            "gender" to gender,
-            "contactNumber" to contactNo,
-            "email" to email,
-            "creationDate" to Timestamp.now(),
-            "updateDate" to Timestamp.now(),
-            "enabled" to true
-        )
-
-        val walletData = mapOf(
-            "balance" to 0,
-            "currency" to "PHP",
-            "loaned" to false,
-            "loanedAmount" to 0,
-        )
-
-        val rfidData = mapOf(
-            "registeredAt" to "",
-            "renewedAt" to "",
-            "rfid" to "",
-        )
-
-        userRef.set(userData).addOnSuccessListener {
-            walletRef.set(walletData)
-            rfidRef.set(rfidData)
-            transactionsRef.set(emptyMap<String, Any>())
-
-            Toast.makeText(requireContext(), "Registration Complete!", Toast.LENGTH_SHORT).show()
-            Log.d("Register", "User Registration Successful")
-            startActivity(Intent(requireContext(), MainActivity::class.java))
-            requireActivity().finish()
-        }.addOnFailureListener { e ->
-            Toast.makeText(requireContext(), "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            Log.e("Register", "User Registration Failed", e)
-        }
-    }
 }

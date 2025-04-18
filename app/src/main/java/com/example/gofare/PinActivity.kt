@@ -13,21 +13,6 @@ import com.google.android.material.button.MaterialButton
 class PinActivity : AppCompatActivity() {
 
     lateinit var binding : ActivityPinBinding
-    lateinit var pin1 : TextView
-    lateinit var pin2 : TextView
-    lateinit var pin3 : TextView
-    lateinit var pin4 : TextView
-
-    lateinit var btn1 : com.google.android.material.button.MaterialButton
-    lateinit var btn2 : com.google.android.material.button.MaterialButton
-    lateinit var btn3 : com.google.android.material.button.MaterialButton
-    lateinit var btn4 : com.google.android.material.button.MaterialButton
-    lateinit var btn5 : com.google.android.material.button.MaterialButton
-    lateinit var btn6 : com.google.android.material.button.MaterialButton
-    lateinit var btn7 : com.google.android.material.button.MaterialButton
-    lateinit var btn8 : com.google.android.material.button.MaterialButton
-    lateinit var btn9 : com.google.android.material.button.MaterialButton
-    lateinit var btn0 : com.google.android.material.button.MaterialButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

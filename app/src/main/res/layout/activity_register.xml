@@ -29,7 +29,7 @@
                 android:layout_width="156dp"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                app:srcCompat="@drawable/go_fare_icon" />
+                app:srcCompat="@drawable/go_fare_v3" />
 
             <TextView
                 android:id="@+id/textView"

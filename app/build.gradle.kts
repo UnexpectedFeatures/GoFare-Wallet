@@ -54,6 +54,7 @@ dependencies {
     implementation ("at.favre.lib:bcrypt:0.9.0")
     implementation(platform("com.google.firebase:firebase-bom:33.11.0"))
     implementation ("com.google.firebase:firebase-firestore:24.9.0")
+    implementation ("org.mindrot:jbcrypt:0.4")
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.database)
