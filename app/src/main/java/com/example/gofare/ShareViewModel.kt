@@ -130,101 +130,70 @@ class SharedViewModel : ViewModel() {
 
     fun obeserveUserWallet() {
         if (userId != null) {
-            val userRFID = rfidRef.document(userId)
-            userRFID.addSnapshotListener { document, error ->
+            val walletsRef = walletRef.document(userId)
+
+            walletsRef.addSnapshotListener { document, error ->
                 if (error != null) {
-                    Log.e("FirebaseData", "Error listening to user data", error)
+                    Log.e("FirebaseData", "Error listening to wallet data", error)
                     return@addSnapshotListener
                 }
+
                 if (document != null && document.exists()) {
+                    val balance = document.getDouble("balance") ?: 0.0
+                    val loanedAmount = document.getDouble("balance") ?: 0.0
 
-                    val rfid = document.getString("rfid")
-                    val walletsRef = walletRef.document(rfid.toString())
+                    _balance.value = DecimalFormat("#,##0.00").format(balance)
+                    _loanedAmount.value = DecimalFormat("#,##0.00").format(loanedAmount)
+                    _currency.value = document.getString("currency")
+                    _loaned.value = document.getBoolean("loaned").toString()
 
-                    walletsRef.addSnapshotListener { document, error ->
-                        if (error != null) {
-                            Log.e("FirebaseData", "Error listening to wallet data", error)
-                            return@addSnapshotListener
-                        }
-
-                        if (document != null && document.exists()) {
-                            val balance = document.getDouble("balance") ?: 0.0
-                            val loanedAmount = document.getDouble("balance") ?: 0.0
-
-                            _balance.value = DecimalFormat("#,##0.00").format(balance)
-                            _loanedAmount.value = DecimalFormat("#,##0.00").format(loanedAmount)
-                            _currency.value = document.getString("currency")
-                            _loaned.value = document.getBoolean("loaned").toString()
-
-                            Log.d("FirebaseData", "Wallet balance updated")
-                        } else {
-                            Log.d("FirebaseData", "Wallet document does not exist")
-                        }
-                    }
-
-
-                    Log.d("FirebaseData", "User data updated successfully")
+                    Log.d("FirebaseData", "Wallet balance updated")
                 } else {
-                    Log.d("FirebaseData", "User document does not exist")
+                    Log.d("FirebaseData", "Wallet document does not exist")
                 }
             }
+            Log.d("FirebaseData", "User data updated successfully")
+        } else {
+            Log.d("FirebaseData", "User document does not exist")
         }
     }
 
     fun observeUserTransactions() {
         if (userId != null) {
-            val userRFID = rfidRef.document(userId)
-            userRFID.addSnapshotListener { document, error ->
+            transactionRef.document(userId).addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    Log.e("FirebaseData", "Error listening to user data", error)
+                    Log.e("FirebaseData", "Error fetching user transactions", error)
                     return@addSnapshotListener
                 }
-                if (document != null && document.exists()) {
 
-                    val rfid = document.getString("rfid")
-
-                    transactionRef.document(rfid.toString()).addSnapshotListener { snapshot, error ->
-                        if (error != null) {
-                            Log.e("FirebaseData", "Error fetching user transactions", error)
-                            return@addSnapshotListener
-                        }
-
-                        if (snapshot != null && snapshot.exists()) {
-                            val allTransactions = mutableListOf<Transaction>()
-
-                            for ((transactionId, value) in snapshot.data ?: emptyMap()) {
-                                val data = value as? Map<*, *> ?: continue
-
-                                val transaction = Transaction(
-                                    transactionId = transactionId,
-                                    pickup = data["pickup"] as? String ?: "",
-                                    dropoff = data["dropoff"] as? String ?: "",
-                                    currentBalance = (data["currentBalance"] as? Number)?.toDouble() ?: 0.0,
-                                    remainingBalance = (data["remainingBalance"] as? Number)?.toDouble() ?: 0.0,
-                                    totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
-                                    discount = data["discount"] as? Boolean ?: false,
-                                    loaned = data["loaned"] as? Boolean ?: false,
-                                    loanedAmount = (data["loanedAmount"] as? Number)?.toDouble() ?: 0.0,
-                                    dateTime = data["dateTime"] as? String ?: ""
-                                )
-
-                                allTransactions.add(transaction)
-                            }
-
-                            _transactions.value = allTransactions
-                            Log.d("FirebaseData", "Observed ${allTransactions.size} transactions.")
-                        } else {
-                            Log.d("FirebaseData", "Document doesn't exist for userId: $userId")
-                        }
+                if (snapshot != null && snapshot.exists()) {
+                    val allTransactions = mutableListOf<Transaction>()
+                    for ((transactionId, value) in snapshot.data ?: emptyMap()) {
+                        val data = value as? Map<*, *> ?: continue
+                        val transaction = Transaction(
+                            transactionId = transactionId,
+                            pickup = data["pickup"] as? String ?: "",
+                            dropoff = data["dropoff"] as? String ?: "",
+                            currentBalance = (data["currentBalance"] as? Number)?.toDouble() ?: 0.0,
+                            remainingBalance = (data["remainingBalance"] as? Number)?.toDouble()
+                                ?: 0.0,
+                            totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
+                            discount = data["discount"] as? Boolean ?: false,
+                            loaned = data["loaned"] as? Boolean ?: false,
+                            loanedAmount = (data["loanedAmount"] as? Number)?.toDouble() ?: 0.0,
+                            dateTime = data["dateTime"] as? String ?: ""
+                        )
+                        allTransactions.add(transaction)
                     }
-
-                    Log.d("FirebaseData", "User Transactions updated successfully")
+                    _transactions.value = allTransactions
+                    Log.d("FirebaseData", "Observed ${allTransactions.size} transactions.")
                 } else {
-                    Log.d("FirebaseData", "User document does not exist")
+                    Log.d("FirebaseData", "Document doesn't exist for userId: $userId")
                 }
             }
-        } else {
-            Log.d("FirebaseData", "User ID is null")
+        }
+        else {
+            Log.d("FirebaseData", "User document does not exist")
         }
     }
 }
