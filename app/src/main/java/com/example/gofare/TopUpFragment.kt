@@ -16,6 +16,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.firebase.firestore.FirebaseFirestore
 import com.stripe.android.Stripe
 import com.stripe.android.model.ConfirmPaymentIntentParams
 import org.json.JSONObject
@@ -76,18 +77,17 @@ class TopUpFragment : Fragment() {
                 Method.POST, url, null,
                 Response.Listener { response ->
 
-                    // Handle the response
+                    // Handle the response from backend (get clientSecret)
                     val clientSecret = response.getString("clientSecret")
 
-                    val stripe = Stripe(requireContext(), "pk_test_51RFeoeKdsoqgvHZObprE6d41umUgO3claXEi7QKzc8lX4LYlLs2v27CISz6XGrqEktrLvL3cWwml4cgr4Vlf8dB600SEzYpv6Q") // Use your actual public key here
+                    // Initialize Stripe SDK
+                    val stripe = Stripe(requireContext(), "pk_test_51RFeoeKdsoqgvHZObprE6d41umUgO3claXEi7QKzc8lX4LYlLs2v27CISz6XGrqEktrLvL3cWwml4cgr4Vlf8dB600SEzYpv6Q") // Replace with your actual public key
 
-                    // Create the PaymentIntent using the clientSecret
-                    val paymentIntentParams = ConfirmPaymentIntentParams.createWithPaymentMethodId(
-                        "pm_card_visa",  // Replace with actual payment method ID (can be collected using Stripe Elements)
-                        clientSecret
-                    )
+                    // Create PaymentIntent params (you can collect payment method from the Stripe Elements in a real app)
+                    val paymentMethodId = "pm_card_visa"
+                    val paymentIntentParams = ConfirmPaymentIntentParams.createWithPaymentMethodId(paymentMethodId, clientSecret)
 
-                    // Confirm the payment on the client
+                    // Confirm the payment intent with the Stripe SDK
                     stripe.confirmPayment(this, paymentIntentParams)
 
                     // Show the AlertDialog after payment is confirmed
@@ -95,30 +95,29 @@ class TopUpFragment : Fragment() {
                         .setTitle("Confirm Top-Up")
                         .setMessage("Are you sure you want to top up ₱$totalDeposit?")
                         .setPositiveButton("Yes") { _, _ ->
-                            // Handle successful top-up and update Firebase as before
+                            // Handle successful top-up and update Firebase
                             val auth = FirebaseAuth.getInstance()
                             val userId = auth.currentUser?.uid
 
                             if (userId != null) {
-                                val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
-                                val walletRef = dbRef.child("wallet")
+                                val dbRef = FirebaseFirestore.getInstance().collection("UserWallet").document(userId)
 
-                                walletRef.get().addOnSuccessListener { snapshot ->
-                                    if (snapshot.exists()) {
-                                        val currentBalance = snapshot.child("balance").getValue(Double::class.java) ?: 0.0
-                                        val status = snapshot.child("status").getValue(String::class.java) ?: "default"
+                                dbRef.get().addOnSuccessListener { documentSnapshot ->
+                                    if (documentSnapshot.exists()) {
+                                        val currentBalance = documentSnapshot.getDouble("balance") ?: 0.0
+                                        val loaned = documentSnapshot.getBoolean("loaned") ?: false
                                         val newBalance = currentBalance + totalDeposit.toDouble()
 
-                                        val updates = mutableMapOf<String, Any>(
+                                        val updates = hashMapOf<String, Any>(
                                             "balance" to newBalance,
                                             "lastUpdated" to System.currentTimeMillis()
                                         )
 
-                                        if (status == "loaned") {
-                                            updates["status"] = "default"
+                                        if (loaned) {
+                                            updates["loaned"] = false
                                         }
 
-                                        walletRef.updateChildren(updates)
+                                        dbRef.update(updates)
                                             .addOnSuccessListener {
                                                 Toast.makeText(requireContext(), "Wallet updated successfully", Toast.LENGTH_SHORT).show()
                                             }
@@ -138,18 +137,15 @@ class TopUpFragment : Fragment() {
                         .create()
 
                     alertDialog.show()
-
-
                 },
                 Response.ErrorListener { error ->
-                    // Handle error
                     Log.d("Server Error", error.message.toString())
                     Toast.makeText(requireContext(), "Server Error: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             ) {
                 override fun getHeaders(): MutableMap<String, String> {
                     val headers = HashMap<String, String>()
-                    headers["Content-Type"] = "application/json"  // Set the Content-Type header to application/json
+                    headers["Content-Type"] = "application/json"
                     return headers
                 }
 
@@ -157,73 +153,12 @@ class TopUpFragment : Fragment() {
                     val params = JSONObject()
                     params.put("userId", FirebaseAuth.getInstance().currentUser?.uid ?: "")
                     params.put("amount", totalDeposit)
-                    return params.toString().toByteArray()  // Convert the JSON to byte array
+                    return params.toString().toByteArray()
                 }
             }
 
             val requestQueue = Volley.newRequestQueue(requireContext())
             requestQueue.add(postRequest)
         }
-
-
-//        btn.setOnClickListener {
-//            val totalDeposit = btn.text.toString().substring(3).trim()
-//
-//            if (totalDeposit.isEmpty()) {
-//                Toast.makeText(requireContext(), "Invalid deposit amount", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
-//
-//            val alertDialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
-//                .setTitle("Confirm Top-Up")
-//                .setMessage("Are you sure you want to top up ₱$totalDeposit?")
-//                .setPositiveButton("Yes") { _, _ ->
-//
-//                    val auth = FirebaseAuth.getInstance()
-//                    val userId = auth.currentUser?.uid
-//
-//                    if (userId != null) {
-//                        val dbRef = FirebaseDatabase.getInstance().getReference("ClientReference").child(userId)
-//                        val walletRef = dbRef.child("wallet")
-//
-//                        walletRef.get().addOnSuccessListener { snapshot ->
-//                            if (snapshot.exists()) {
-//                                val currentBalance = snapshot.child("balance").getValue(Double::class.java) ?: 0.0
-//                                val status = snapshot.child("status").getValue(String::class.java) ?: "default"
-//                                val newBalance = currentBalance + totalDeposit.toDouble()
-//
-//                                val updates = mutableMapOf<String, Any>(
-//                                    "balance" to newBalance,
-//                                    "lastUpdated" to System.currentTimeMillis()
-//                                )
-//
-//                                if (status == "loaned") {
-//                                    updates["status"] = "default"
-//                                }
-//
-//                                walletRef.updateChildren(updates)
-//                                    .addOnSuccessListener {
-//                                        Toast.makeText(requireContext(), "Wallet updated successfully", Toast.LENGTH_SHORT).show()
-//                                    }
-//                                    .addOnFailureListener {
-//                                        Toast.makeText(requireContext(), "Failed to update wallet", Toast.LENGTH_SHORT).show()
-//                                    }
-//
-//                            } else {
-//                                Toast.makeText(requireContext(), "Wallet not found", Toast.LENGTH_SHORT).show()
-//                            }
-//                        }.addOnFailureListener {
-//                            Toast.makeText(requireContext(), "Failed to read wallet", Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//
-//                }
-//                .setNegativeButton("No", null)
-//                .create()
-//
-//            alertDialog.show()
-//        }
     }
-
-
 }
