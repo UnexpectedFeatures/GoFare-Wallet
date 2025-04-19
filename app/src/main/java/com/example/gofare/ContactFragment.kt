@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.lifecycle.ViewModelProvider
 import com.example.gofare.databinding.FragmentContactBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -87,7 +88,28 @@ class ContactFragment : Fragment() {
         }
 
         submitBtn.setOnClickListener {
-            createRequest()
+            val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+            var count = 0
+            viewModel.startLive()
+
+            viewModel.requests.observe(viewLifecycleOwner) { requests ->
+                for (request in requests) {
+                    if (request.status == "Pending") {
+                        count++
+                    }
+                }
+            }
+
+            if (count > 3){
+                Toast.makeText(requireContext(), "You currently have too many ongoing requests", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "We are sorry for the delay in response", Toast.LENGTH_SHORT).show()
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, SettingsFragment())
+                    .commit()
+            }
+            else{
+                createRequest()
+            }
         }
     }
 

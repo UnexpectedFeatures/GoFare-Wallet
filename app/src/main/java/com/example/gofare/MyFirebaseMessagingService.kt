@@ -12,38 +12,20 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // Check if the message contains a notification
         remoteMessage.notification?.let {
             sendNotification(it.title, it.body)
         }
     }
 
-    private fun sendNotification(title: String?, messageBody: String?) {
-        val channelId = "transaction_channel"
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Create notification channel if needed (for Android 8.0+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Transaction Notifications",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.go_fare_icon)
-            .setContentTitle(title)
-            .setContentText(messageBody)
+    private fun sendNotification(title: String?, message: String?) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val builder = NotificationCompat.Builder(this, "transaction_channel")
+            .setSmallIcon(R.drawable.go_fare_v2) // use your own icon
+            .setContentTitle(title ?: "Transaction Alert")
+            .setContentText(message ?: "New transaction detected")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
 
-        notificationManager.notify(0, notificationBuilder.build())
-    }
-
-    override fun onNewToken(token: String) {
-        // Send the token to your server (optional)
-        super.onNewToken(token)
+        notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
     }
 }

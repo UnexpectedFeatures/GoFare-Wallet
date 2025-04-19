@@ -45,15 +45,19 @@ class HomeActivity : AppCompatActivity() {
         if (currentUserId != null) {
             viewModel.startLive()
 
-            viewModel.transactions.observe(this) { list ->
-                if (lastKnownTransactions != null && list != lastKnownTransactions) {
-                    NotificationHelper.sendNotification(
-                        this,
-                        "Transactions Updated",
-                        "Your transactions have changed."
-                    )
+            viewModel.notificationsEnabled.observe(this) { enabled ->
+                if (enabled){
+                    viewModel.transactions.observe(this) { list ->
+                        if (lastKnownTransactions != null && list != lastKnownTransactions) {
+                            NotificationHelper.sendNotification(
+                                this,
+                                "Transactions Updated",
+                                "Your transactions have changed."
+                            )
+                        }
+                        lastKnownTransactions = list
+                    }
                 }
-                lastKnownTransactions = list
             }
 
         } else {

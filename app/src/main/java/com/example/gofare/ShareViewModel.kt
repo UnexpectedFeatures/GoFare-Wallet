@@ -26,6 +26,14 @@ class SharedViewModel : ViewModel() {
     private var transactionListener: ValueEventListener? = null
     private var requestListener: ValueEventListener? = null
 
+    // Notification
+    private val _notificationsEnabled = MutableLiveData<Boolean>(true) // default: enabled
+    val notificationsEnabled: LiveData<Boolean> = _notificationsEnabled
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        _notificationsEnabled.value = enabled
+    }
+
     // User Data
     private val _fullName = MutableLiveData<String>()
     val fullName: LiveData<String> get() = _fullName

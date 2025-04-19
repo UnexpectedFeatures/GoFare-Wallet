@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -21,6 +22,8 @@ class SettingsFragment : Fragment() {
     private lateinit var contactButton : com.google.android.material.button.MaterialButton
     private lateinit var privacyButton: com.google.android.material.button.MaterialButton
     private lateinit var aboutButton: com.google.android.material.button.MaterialButton
+    private lateinit var swNotification: Switch
+    private lateinit var swVibrate: Switch
     private lateinit var stFullName : TextView
     private lateinit var stEmail : TextView
     private lateinit var userVerified : TextView
@@ -48,6 +51,7 @@ class SettingsFragment : Fragment() {
 
         logoutButton = view.findViewById(R.id.logoutButton)
         editProfile = view.findViewById(R.id.editProfileButton)
+        swNotification = view.findViewById(R.id.swNotification)
         stFullName = view.findViewById(R.id.stFullName)
         stEmail = view.findViewById(R.id.stEmail)
         userVerified = view.findViewById(R.id.userVerified)
@@ -65,6 +69,11 @@ class SettingsFragment : Fragment() {
                 userVerified.text = "Verified"
                 userVerified.setTextColor(Color.BLACK)
             }
+        }
+
+        swNotification.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setNotificationsEnabled(isChecked)
+            Toast.makeText(requireContext(), "Notifications: $isChecked", Toast.LENGTH_SHORT).show()
         }
 
         editProfile.setOnClickListener {
