@@ -28,13 +28,24 @@ data class RFID(
 @Parcelize
 data class Transaction(
     val currentBalance: Double = 0.0,
-    val dateTime: String = "4-13-2025 5:08 PM",
+    val dateTime: String? = null,
     val discount: Boolean = false,
-    val dropoff: String = "Vicas",
+    val dropoff: String? = null,
     val loaned: Boolean = false,
     val loanedAmount: Double = 0.0,
-    val pickup: String = "Kiko",
-    val remainingBalance: Double = 1000.0,
-    val totalAmount: Double = 13.0,
-    val transactionId: String = "TX-0125215"
+    val pickup: String? = null,
+    val remainingBalance: Double = 0.0,
+    val totalAmount: Double = 0.0,
+    val transactionId: String? = null,
+): Parcelable
+
+@Parcelize
+data class UserRequest(
+    val date: String? = null,
+    val time: String? = null,
+    val description: String? = null,
+    val reason: String? = null,
+    val status: String? = null,
+    val type: String? = null,
+    val requestId: String? = null,
 ): Parcelable

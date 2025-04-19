@@ -1,5 +1,6 @@
 package com.example.gofare
 
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 
 class ReceiptFragment : Fragment() {
 
@@ -16,8 +18,7 @@ class ReceiptFragment : Fragment() {
     private lateinit var pickup : TextView
     private lateinit var dropoff : TextView
     private lateinit var loaned : TextView
-    private lateinit var date : TextView
-    private lateinit var time : TextView
+    private lateinit var dateTime : TextView
     private lateinit var balance : TextView
     private lateinit var total : TextView
     private lateinit var remainingBalance : TextView
@@ -46,8 +47,7 @@ class ReceiptFragment : Fragment() {
         pickup = view.findViewById(R.id.pickUp)
         dropoff = view.findViewById(R.id.dropOff)
         loaned = view.findViewById(R.id.loaned)
-        date = view.findViewById(R.id.date)
-        time = view.findViewById(R.id.time)
+        dateTime = view.findViewById(R.id.dateTime)
         balance = view.findViewById(R.id.balance)
         total = view.findViewById(R.id.total)
         remainingBalance = view.findViewById(R.id.remainingBalance)
@@ -64,18 +64,31 @@ class ReceiptFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
 
+        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+        viewModel.startLive()
+
         Log.d("Transaction: ", transaction.toString())
 
-        transactionId.text = transaction?.transactionId
-        pickup.text = transaction?.pickup
-        dropoff.text = transaction?.dropoff
-        loaned.text = "Loaned: " + transaction?.loaned.toString()
-        date.text = "Date: " + transaction?.dateTime
-        time.text = "Time: " + transaction?.dateTime
-        balance.text = transaction?.currentBalance.toString()
-        total.text = transaction?.totalAmount.toString()
-        remainingBalance.text = transaction?.remainingBalance.toString()
+        if (transaction?.loaned == false){
+            loaned.visibility = View.GONE
 
+        }
+        else {
+            loaned.visibility = View.VISIBLE
+        }
+        viewModel.currency.observe(viewLifecycleOwner) { currency ->
+
+
+            transactionId.text = transaction?.transactionId
+            pickup.text = transaction?.pickup
+            dropoff.text = transaction?.dropoff
+            loaned.text = "Loaned: " + transaction?.loaned.toString()
+            dateTime.text = "Date: " + transaction?.dateTime
+            balance.text = "$currency " + transaction?.currentBalance.toString()
+            total.text = "$currency " + transaction?.totalAmount.toString()
+            remainingBalance.text = "$currency " + transaction?.remainingBalance.toString()
+
+        }
         return view
     }
 

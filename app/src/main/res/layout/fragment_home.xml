@@ -38,10 +38,30 @@
             android:background="@drawable/background_primary"
             android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvWelcome"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="12dp"
+                android:paddingHorizontal="8dp"
+                android:text="Welcome User!"
+                android:textColor="@color/black"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black"
+                android:elevation="2dp"/>
+
+            <LinearLayout
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_full_skyblue"
                 android:orientation="horizontal"
                 android:padding="4dp">
 
@@ -67,34 +87,17 @@
                     android:ellipsize="end"
                     android:gravity="center"
                     android:textStyle="bold" />
-
-                <ImageButton
-                    android:id="@+id/topUpBtn"
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:background="@drawable/ripple_skyblue"
-                    android:layout_marginHorizontal="4dp"
-                    android:src="@drawable/ic_add"
-                    />
-
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/black"
-                android:elevation="2dp"/>
-
-            <TextView
-                android:id="@+id/tvWelcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingVertical="12dp"
-                android:paddingHorizontal="8dp"
-                android:text="Welcome User!"
-                android:textColor="@color/black"
-                android:textSize="32sp"
-                android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/topUpBtn"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="end"
+                android:background="@drawable/ripple_skyblue"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_add"
+                />
 
             <View
                 android:layout_width="match_parent"
@@ -112,7 +115,6 @@
                     android:id="@+id/tvOverview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
                     android:padding="4dp"
                     android:paddingVertical="12dp"
                     android:layout_marginHorizontal="8dp"
@@ -135,41 +137,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/tvOverview" />
 
                 <TextView
-                    android:id="@+id/TransactionTV"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="16dp"
-                    android:layout_marginHorizontal="8dp"
-                    android:text="Transactions:"
-                    android:textColor="@color/black"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvOverview" />
-
-                <TextView
-                    android:id="@+id/transactionCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="12dp"
-                    android:text="5 Current Transactions"
-                    android:textColor="@color/black"
-                    android:textSize="20sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/TransactionTV" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/black"
-                    android:layout_marginTop="8dp"
-                    android:elevation="2dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/transactionCount" />
-
-                <TextView
                     android:id="@+id/RecentTransactionTV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -180,7 +147,7 @@
                     android:textSize="24sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/transactionCount" />
+                    app:layout_constraintTop_toBottomOf="@+id/tvOverview" />
 
                 <TextView
                     android:id="@+id/pickup"

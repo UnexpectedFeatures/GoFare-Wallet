@@ -22,7 +22,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var tvCurrency: TextView
     private lateinit var topUpBtn: ImageButton
 
-    private lateinit var transactionCount: TextView
     private lateinit var pickup: TextView
     private lateinit var dropoff: TextView
     private lateinit var total: TextView
@@ -47,7 +46,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         tvCurrency = view.findViewById(R.id.tvCurrency)
         topUpBtn = view.findViewById(R.id.topUpBtn)
 
-        transactionCount = view.findViewById(R.id.transactionCount)
         pickup = view.findViewById(R.id.pickup)
         dropoff = view.findViewById(R.id.dropoff)
         total = view.findViewById(R.id.total)
@@ -68,7 +66,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         viewModel.startLive()
 
         viewModel.transactions.observe(viewLifecycleOwner) { transactionsList ->
-            transactionCount.text = "Transactions: ${transactionsList.size}"
             if (transactionsList.isNotEmpty()) {
                 val lastTransaction = transactionsList[transactionsList.size - 1]
                 pickup.text = "Pickup: ${lastTransaction.pickup ?: "Unknown"}"
@@ -94,6 +91,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
 
         viewModel.balance.observe(viewLifecycleOwner) { balance ->
+            if (balance.length > 5){
+                tvBalance.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30f)
+            }
+            else{
+                tvBalance.setTextSize(TypedValue.COMPLEX_UNIT_SP, 40f)
+            }
             tvBalance.text = "₱$balance"
         }
 

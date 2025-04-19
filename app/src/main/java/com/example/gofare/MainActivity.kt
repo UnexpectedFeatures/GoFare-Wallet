@@ -4,6 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType
@@ -13,6 +15,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.Toast.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
@@ -33,16 +36,32 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        toRegister = findViewById(R.id.toRegister);
-        usernameInput = findViewById(R.id.usernameEditText);
-        passwordInput = findViewById(R.id.passwordEditText);
-        toResetPassword = findViewById(R.id.forgotPassword);
-        loginButton = findViewById(R.id.loginButton);
-        toggleVisibility = findViewById(R.id.togglePasswordBtn);
+        // In Development!!
+        if (intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED) {
+            val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent?.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                intent?.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+            }
+            if (tag != null) {
+                Toast.makeText(this, "Device does not support NFC", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(this, "NFC: " + tag, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        toRegister = findViewById(R.id.toRegister)
+        usernameInput = findViewById(R.id.usernameEditText)
+        passwordInput = findViewById(R.id.passwordEditText)
+        toResetPassword = findViewById(R.id.forgotPassword)
+        loginButton = findViewById(R.id.loginButton)
+        toggleVisibility = findViewById(R.id.togglePasswordBtn)
 
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
-            Toast.makeText(this, "Welcome Back ${currentUser.email}", Toast.LENGTH_LONG).show()
+            makeText(this, "Welcome Back ${currentUser.email}", LENGTH_LONG).show()
             val intent = Intent(
                 this@MainActivity,
                 PinActivity::class.java
@@ -64,7 +83,7 @@ class MainActivity : AppCompatActivity() {
 //                PinActivity::class.java
             )
             startActivity(intent)
-        });
+        })
 
         var isPasswordVisible = false
 
@@ -87,15 +106,15 @@ class MainActivity : AppCompatActivity() {
             val password = passwordInput.text.toString().trim()
 
             if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please Fill Out The Fields", Toast.LENGTH_SHORT).show()
+                makeText(this, "Please Fill Out The Fields", LENGTH_SHORT).show()
                 return@OnClickListener
             }
             if (!email.contains("@")) {
-                Toast.makeText(this, "Please Enter a Valid Email", Toast.LENGTH_SHORT).show()
+                makeText(this, "Please Enter a Valid Email", LENGTH_SHORT).show()
                 return@OnClickListener
             }
 
-            loginUser(email, password);
+            loginUser(email, password)
         })
     }
 
@@ -103,8 +122,8 @@ class MainActivity : AppCompatActivity() {
         var auth: FirebaseAuth = FirebaseAuth.getInstance()
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful()) {
-                    Toast.makeText(this, "Log In Success", Toast.LENGTH_SHORT).show()
+                if (task.isSuccessful) {
+                    makeText(this, "Log In Success", LENGTH_SHORT).show()
                     Log.d("Firebase", "Login Successful")
                     val intent = Intent(
                         this@MainActivity,
@@ -112,8 +131,8 @@ class MainActivity : AppCompatActivity() {
                     )
                     startActivity(intent)
                 } else {
-                    Log.e("Firebase", "Login Failed", task.getException())
-                    Toast.makeText(this, "Log In Failed", Toast.LENGTH_SHORT).show()
+                    Log.e("Firebase", "Login Failed", task.exception)
+                    makeText(this, "Log In Failed", LENGTH_SHORT).show()
                 }
             }
     }

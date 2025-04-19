@@ -12,20 +12,14 @@ class TransactionAdapter(
 ) : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
 
     inner class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val transactionId: TextView = itemView.findViewById(R.id.transactionId)
-        private val balance: TextView = itemView.findViewById(R.id.balance)
+        private val location: TextView = itemView.findViewById(R.id.location)
         private val date: TextView = itemView.findViewById(R.id.date)
-        private val pickUpTxt: TextView = itemView.findViewById(R.id.pickUp)
-        private val dropOffTxt: TextView = itemView.findViewById(R.id.dropOff)
         private val total: TextView = itemView.findViewById(R.id.total)
 
         fun bind(transaction: Transaction) {
-            transactionId.text = transaction.transactionId ?: "No ID"
-            balance.text = "Balance: ${transaction.currentBalance}"
+            location.text = transaction.pickup + " - " + transaction.dropoff
             date.text = "Date: ${transaction.dateTime}"
-            pickUpTxt.text = "Pick Up: ${transaction.pickup}"
-            dropOffTxt.text = "Drop Off: ${transaction.dropoff}"
-            total.text = "Total: ${transaction.totalAmount}"
+            total.text = "- ${transaction.totalAmount}"
 
             itemView.setOnClickListener {
                 onItemClick(transaction)

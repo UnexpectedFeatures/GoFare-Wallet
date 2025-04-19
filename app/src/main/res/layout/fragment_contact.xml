@@ -7,6 +7,18 @@
     android:background="@drawable/background_main"
     tools:context=".ContactFragment">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include layout="@layout/header_default" />
+    </LinearLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
@@ -66,37 +78,13 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <TextView
-            android:id="@+id/specifyRequestLabel"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:layout_margin="8dp"
-            android:text="Specific Request:"
-            android:textSize="16dp"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/typeMenu" />
-
-        <EditText
-            android:id="@+id/ctOtherType"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:textColor="@color/black"
-            android:textSize="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/specifyRequestLabel" />
-
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/reasonMenu"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            app:layout_constraintTop_toBottomOf="@id/ctOtherType"
+            app:layout_constraintTop_toBottomOf="@id/typeMenu"
             tools:layout_editor_absoluteX="8dp">
 
             <AutoCompleteTextView
@@ -113,6 +101,29 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/specifyRequestLabel"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_margin="8dp"
+            android:text="Specific Reason:"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/reasonMenu" />
+
+        <EditText
+            android:id="@+id/ctOtherType"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/specifyRequestLabel" />
+
+        <TextView
             android:id="@+id/descriptionLabel"
             android:layout_width="match_parent"
             android:layout_height="24dp"
@@ -121,7 +132,7 @@
             android:text="Description:"
             android:textSize="16dp"
             android:textColor="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/reasonMenu"
+            app:layout_constraintTop_toBottomOf="@id/ctOtherType"
             tools:layout_editor_absoluteX="8dp" />
 
         <EditText

@@ -5,7 +5,6 @@
         <item>Request</item>
         <item>Complaint</item>
         <item>Report</item>
-        <item>Others (Specify)</item>
     </string-array>
     <string-array name="requestReason">
         <item>Missing RFID</item>
@@ -13,5 +12,6 @@
         <item>Account Loaning Suspension</item>
         <item>Account Deposit Refund</item>
         <item>Account Deletion</item>
+        <item>Others (Specify)</item>
     </string-array>
 </resources>

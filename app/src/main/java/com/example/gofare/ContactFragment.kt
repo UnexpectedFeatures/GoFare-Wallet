@@ -73,12 +73,12 @@ class ContactFragment : Fragment() {
         binding.typeAutoCompleteView.setOnItemClickListener { _, _, position, _ ->
             val selected = binding.typeAutoCompleteView.adapter.getItem(position).toString()
             Log.d("DropdownSelection", "Selected item: $selected")
-            ctOtherType.visibility = if (selected == "Others (Specify)") View.VISIBLE else View.GONE
-            specifyRequestLabel.visibility = if (selected == "Others (Specify)") View.VISIBLE else View.GONE
         }
 
         binding.reasonAutoCompleteView.setOnItemClickListener { _, _, position, _ ->
             val selected = binding.reasonAutoCompleteView.adapter.getItem(position).toString()
+            ctOtherType.visibility = if (selected == "Others (Specify)") View.VISIBLE else View.GONE
+            specifyRequestLabel.visibility = if (selected == "Others (Specify)") View.VISIBLE else View.GONE
             Log.d("DropdownSelection", "Selected item: $selected")
         }
 
@@ -107,7 +107,6 @@ class ContactFragment : Fragment() {
 
         val case = binding.typeAutoCompleteView.text.toString()
         val reason = binding.reasonAutoCompleteView.text.toString()
-        val otherType = ctOtherType.text.toString()
         val description = ctDescription.text.toString()
 
         if (case.isEmpty() || reason.isEmpty() || reason == "Reason") {
@@ -129,7 +128,6 @@ class ContactFragment : Fragment() {
                     "requestId" to requestId,
                     "type" to case,
                     "reason" to reason,
-                    "otherType" to if (case == "Others (Specify)") otherType else "",
                     "description" to description,
                     "date" to currentDate,
                     "time" to currentTime,
@@ -142,6 +140,8 @@ class ContactFragment : Fragment() {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Toast.makeText(requireContext(), "Request Sent Successfully", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "We will email our response to your request", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Thanks for the feedback! :D", Toast.LENGTH_SHORT).show()
                             switchFragment(SettingsFragment())
                         } else {
                             Toast.makeText(requireContext(), "Request Sending Failed", Toast.LENGTH_SHORT).show()

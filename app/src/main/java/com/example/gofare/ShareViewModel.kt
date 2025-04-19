@@ -20,9 +20,11 @@ class SharedViewModel : ViewModel() {
     private val walletRef = FirebaseFirestore.getInstance().collection("UserWallet")
     private val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID")
     private val transactionRef = FirebaseFirestore.getInstance().collection("UserTransaction")
+    private val requestsRef = FirebaseFirestore.getInstance().collection("UserRequests")
 
     private var usersListener: ValueEventListener? = null
     private var transactionListener: ValueEventListener? = null
+    private var requestListener: ValueEventListener? = null
 
     // User Data
     private val _fullName = MutableLiveData<String>()
@@ -72,6 +74,10 @@ class SharedViewModel : ViewModel() {
     private val _transactions = MutableLiveData<List<Transaction>>()
     val transactions: LiveData<List<Transaction>> get() = _transactions
 
+    // User Requests
+    private val _requests = MutableLiveData<List<UserRequest>>()
+    val requests: LiveData<List<UserRequest>> get() = _requests
+
     // Current User RFID
     private val _rfid = MutableLiveData<String>()
     val rfid: LiveData<String> get() = _rfid
@@ -93,9 +99,46 @@ class SharedViewModel : ViewModel() {
             }
 
             observeUserData()
+            observeUserRequests()
             observeUserTransactions()
             obeserveUserWallet()
         }
+    }
+
+    fun observeUserRequests(){
+        if (userId != null){
+            requestsRef.document(userId).addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("FirebaseData", "Error fetching user transactions", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val allRequests = mutableListOf<UserRequest>()
+                    for ((requestId, value) in snapshot.data ?: emptyMap()) {
+                        val data = value as? Map<*, *> ?: continue
+                        val request = UserRequest(
+                            requestId = requestId,
+                            date = data["date"] as? String ?: "",
+                            time = data["time"] as? String ?: "",
+                            status = data["status"] as? String ?: "",
+                            type = data["type"] as? String ?: "",
+                            description = data["description"] as? String ?: "",
+                            reason = data["reason"] as? String ?: ""
+                        )
+                        allRequests.add(request)
+                    }
+                    _requests.value = allRequests
+                    Log.d("FirebaseData", "Observed ${allRequests.size} transactions.")
+                } else {
+                    Log.d("FirebaseData", "Document doesn't exist for userId: $userId")
+                }
+            }
+        }
+        else {
+            Log.d("FirebaseData", "User document does not exist")
+        }
+
     }
 
     fun observeUserData() {
