@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.enableEdgeToEdge
 import com.example.gofare.databinding.ActivityPinBinding
 import com.example.gofare.databinding.FragmentMPinRegisterBinding
@@ -33,6 +34,18 @@ class MPinRegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            val user = auth.currentUser
+            if (user != null){
+                user.delete()
+                Toast.makeText(requireContext(), "Registration Aborted", Toast.LENGTH_SHORT).show()
+
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.register_frame, RegisterFragment())
+                    .commit()
+            }
+        }
 
         auth = FirebaseAuth.getInstance()
 
@@ -60,6 +73,9 @@ class MPinRegisterFragment : Fragment() {
             user?.delete()
                 ?.addOnSuccessListener {
                     Toast.makeText(requireContext(), "Registration Cancelled", Toast.LENGTH_SHORT).show()
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.register_frame, RegisterFragment())
+                        .commit()
                 }
                 ?.addOnFailureListener {
                     Toast.makeText(requireContext(), "Registration Abort Failure", Toast.LENGTH_SHORT).show()

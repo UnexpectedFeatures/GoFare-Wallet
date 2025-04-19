@@ -15,6 +15,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.Visibility
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +32,7 @@ class ProfileFragment : Fragment() {
     private lateinit var pfFirstName : EditText
     private lateinit var pfMiddleName : EditText
     private lateinit var pfLastName : EditText
+    private lateinit var emailLabel : TextView
     private lateinit var pfEmail : EditText
     private lateinit var pfContactNumber : EditText
     private lateinit var pfAddress : EditText
@@ -56,11 +58,18 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, SettingsFragment())
+                .commit()
+        }
+
         userProfile = view.findViewById(R.id.userProfile)
         pfFirstName = view.findViewById(R.id.pfFirstName)
         pfMiddleName = view.findViewById(R.id.pfMiddleName)
         pfLastName = view.findViewById(R.id.pfLastName)
         pfEmail = view.findViewById(R.id.pfEmail)
+        emailLabel = view.findViewById(R.id.emailLabel)
         pfContactNumber = view.findViewById(R.id.pfContactNumber)
         pfAddress = view.findViewById(R.id.pfAddress)
         pfBirthday = view.findViewById(R.id.pfBirthday)
@@ -81,6 +90,8 @@ class ProfileFragment : Fragment() {
             ageText.visibility = View.GONE
             editBtn.visibility = View.GONE
             editLayout.visibility = View.VISIBLE
+            pfEmail.visibility = View.GONE
+            emailLabel.visibility = View.GONE
         }
 
         saveBtn.setOnClickListener{
@@ -91,6 +102,8 @@ class ProfileFragment : Fragment() {
             ageText.visibility = View.VISIBLE
             editBtn.visibility = View.VISIBLE
             editLayout.visibility = View.GONE
+            pfEmail.visibility = View.VISIBLE
+            emailLabel.visibility = View.VISIBLE
         }
 
         cancelBtn.setOnClickListener{
@@ -98,6 +111,8 @@ class ProfileFragment : Fragment() {
             setEnabled(false)
             editBtn.visibility = View.VISIBLE
             editLayout.visibility = View.GONE
+            pfEmail.visibility = View.VISIBLE
+            emailLabel.visibility = View.VISIBLE
             displayUserData()
         }
 

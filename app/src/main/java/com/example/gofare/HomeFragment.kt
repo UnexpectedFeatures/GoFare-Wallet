@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
 import com.google.type.DateTime
 
@@ -35,6 +37,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), "Please Log Out in the settings", Toast.LENGTH_SHORT).show()
+        }
+
         tvWelcome = view.findViewById(R.id.tvWelcome)
         tvBalance = view.findViewById(R.id.tvBalance)
         tvCurrency = view.findViewById(R.id.tvCurrency)

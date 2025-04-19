@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +32,18 @@ class RegisterEmailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            val user = auth.currentUser
+            if (user != null){
+                user.delete()
+                Toast.makeText(requireContext(), "Registration Aborted", Toast.LENGTH_SHORT).show()
+
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.register_frame, RegisterFragment())
+                    .commit()
+            }
+        }
 
         auth = FirebaseAuth.getInstance()
 

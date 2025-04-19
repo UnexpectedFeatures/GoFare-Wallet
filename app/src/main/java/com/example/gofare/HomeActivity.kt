@@ -16,10 +16,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import android.Manifest
 import android.content.pm.PackageManager
+import android.nfc.NfcAdapter
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 class HomeActivity : AppCompatActivity() {
+
+    private var nfcAdapter: NfcAdapter? = null
 
     private lateinit var HomeButton: ImageButton
     private lateinit var SettingsButton: ImageButton
@@ -33,13 +36,14 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         viewModel = ViewModelProvider(this)[SharedViewModel::class.java]
 
         val auth = FirebaseAuth.getInstance()
         val currentUserId = auth.currentUser?.uid
 
         if (currentUserId != null) {
-            viewModel.observeUserData()
+            viewModel.startLive()
 
             viewModel.transactions.observe(this) { list ->
                 if (lastKnownTransactions != null && list != lastKnownTransactions) {
@@ -62,13 +66,6 @@ class HomeActivity : AppCompatActivity() {
                 .commit()
         }
 
-        if (viewModel.rfid == null || viewModel.rfid.toString().isEmpty()){
-            TransactionsButton.visibility = View.GONE
-        }
-        else{
-            View.VISIBLE
-        }
-
         HomeButton = findViewById(R.id.HomeButton)
         SettingsButton = findViewById(R.id.SettingsButton)
         TransactionsButton = findViewById(R.id.TransactionsButton)
@@ -77,6 +74,16 @@ class HomeActivity : AppCompatActivity() {
         SettingsButton.setOnClickListener { switchFragment(SettingsFragment()) }
         TransactionsButton.setOnClickListener { switchFragment(TransactionsFragment()) }
 
+
+        viewModel.rfid.observe(this) { rfid ->
+            if (rfid.isNullOrEmpty()) {
+                if (nfcAdapter == null){
+                    TransactionsButton.visibility = View.GONE
+                }
+            } else {
+                TransactionsButton.visibility = View.VISIBLE
+            }
+        }
 
         // Request notification permission if needed
         requestNotificationPermission()

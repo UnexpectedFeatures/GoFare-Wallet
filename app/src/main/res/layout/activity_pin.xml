@@ -282,7 +282,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/forgotPassword"
+        android:id="@+id/forgotPin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
