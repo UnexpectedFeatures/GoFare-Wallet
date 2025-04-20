@@ -20,6 +20,7 @@ class SettingsFragment : Fragment() {
     private lateinit var logoutButton : com.google.android.material.button.MaterialButton
     private lateinit var editProfile : LinearLayout
     private lateinit var contactButton : com.google.android.material.button.MaterialButton
+    private lateinit var topUpHistoryButton : com.google.android.material.button.MaterialButton
     private lateinit var privacyButton: com.google.android.material.button.MaterialButton
     private lateinit var aboutButton: com.google.android.material.button.MaterialButton
     private lateinit var swNotification: Switch
@@ -50,6 +51,7 @@ class SettingsFragment : Fragment() {
         }
 
         logoutButton = view.findViewById(R.id.logoutButton)
+        topUpHistoryButton = view.findViewById(R.id.topUpHistoryBtn)
         editProfile = view.findViewById(R.id.editProfileButton)
         swNotification = view.findViewById(R.id.swNotification)
         stFullName = view.findViewById(R.id.stFullName)
@@ -82,6 +84,10 @@ class SettingsFragment : Fragment() {
 
         contactButton.setOnClickListener {
             switchFragment(ContactFragment())
+        }
+
+        topUpHistoryButton.setOnClickListener {
+            switchFragment(TopUpHistoryFragment())
         }
 
         logoutButton.setOnClickListener(View.OnClickListener {

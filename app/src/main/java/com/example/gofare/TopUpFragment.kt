@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.gofare.databinding.FragmentTopUpBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -16,10 +17,14 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.stripe.android.Stripe
 import com.stripe.android.model.ConfirmPaymentIntentParams
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class TopUpFragment : Fragment() {
@@ -67,6 +72,8 @@ class TopUpFragment : Fragment() {
 
     }
     private fun assignId(btn: com.google.android.material.button.MaterialButton) {
+        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+
         btn.setOnClickListener {
             val totalDeposit = btn.text.toString().substring(3).trim()
 
@@ -106,6 +113,7 @@ class TopUpFragment : Fragment() {
 
                             if (userId != null) {
                                 val dbRef = FirebaseFirestore.getInstance().collection("UserWallet").document(userId)
+                                val topUpRef = FirebaseFirestore.getInstance().collection("UserTopUp").document(userId)
 
                                 dbRef.get().addOnSuccessListener { documentSnapshot ->
                                     if (documentSnapshot.exists()) {
@@ -117,6 +125,40 @@ class TopUpFragment : Fragment() {
                                             "balance" to newBalance,
                                             "lastUpdated" to System.currentTimeMillis()
                                         )
+
+                                        val tax = totalDeposit.toDouble() * 0.10
+                                        val topUpAmount = totalDeposit.toDouble()
+                                        val totalCost = topUpAmount + tax
+
+                                        topUpRef.get().addOnSuccessListener { snapshot ->
+                                            val existingTopup = snapshot.data ?: emptyMap<String, Any>()
+                                            val count = existingTopup.size
+                                            val topUpId = "TU-" + String.format("%04d", count + 1)
+
+                                            val timestamp = Timestamp.now()
+                                            val date = timestamp.toDate()
+
+                                            val sdf = SimpleDateFormat("M/d/yyyy h:mm a", Locale.getDefault())
+                                            val formattedDate = sdf.format(date)
+
+                                            val newTopUp = mapOf(
+                                                "dateTime" to formattedDate,
+                                                "tax" to tax,
+                                                "topUpAmount" to topUpAmount,
+                                                "totalCost" to totalCost
+                                            )
+
+                                            val updateMap = mapOf(topUpId to newTopUp)
+
+                                            topUpRef.set(updateMap, SetOptions.merge())
+                                                .addOnCompleteListener { task ->
+                                                    if (task.isSuccessful) {
+                                                        Log.d("Top Up", "Successful Record")
+                                                    } else {
+                                                        Log.d("Top Up", "Failure to Record")
+                                                    }
+                                                }
+                                        }
 
                                         if (loaned) {
                                             updates["loaned"] = false
