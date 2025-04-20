@@ -17,14 +17,21 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.messaging.FirebaseMessaging
+import com.stripe.android.PaymentConfiguration
 import com.stripe.android.Stripe
 import com.stripe.android.model.ConfirmPaymentIntentParams
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Objects
+import kotlin.math.ceil
 
 
 class TopUpFragment : Fragment() {
@@ -32,7 +39,17 @@ class TopUpFragment : Fragment() {
     private lateinit var requestQueue: RequestQueue
     lateinit var binding : FragmentTopUpBinding
 
-    private lateinit var backBtn : com.google.android.material.button.MaterialButton
+    lateinit var totalDeposit : String
+
+    private lateinit var paymentSheet: com.stripe.android.paymentsheet.PaymentSheet
+
+    private lateinit var clientSecret: String
+    private var totalAmountWithFee: Double = 0.0
+    private var usdAmount: Double = 0.0
+    private var taxedUsd: Double = 0.0
+    private var totalCostPhp: Double = 0.0
+    private var fcmToken : String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +67,17 @@ class TopUpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        PaymentConfiguration.init(
+            requireContext(),
+            "pk_test_51RFeoeKdsoqgvHZObprE6d41umUgO3claXEi7QKzc8lX4LYlLs2v27CISz6XGrqEktrLvL3cWwml4cgr4Vlf8dB600SEzYpv6Q"
+        )
+
+        // Then initialize your PaymentSheet
+        paymentSheet = PaymentSheet(this) { paymentResult ->
+            onPaymentSheetResult(paymentResult)
+        }
+
         requestQueue = Volley.newRequestQueue(requireContext())
 
         binding.backBtn.setOnClickListener{
@@ -71,141 +99,153 @@ class TopUpFragment : Fragment() {
         assignId(binding.creditsE)
 
     }
-    private fun assignId(btn: com.google.android.material.button.MaterialButton) {
-        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
+    private fun assignId(btn: MaterialButton) {
         btn.setOnClickListener {
-            val totalDeposit = btn.text.toString().substring(3).trim()
+            totalDeposit = btn.text.toString().substring(3).trim()
 
             if (totalDeposit.isEmpty()) {
                 Toast.makeText(requireContext(), "Invalid deposit amount", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Send the deposit amount to your backend for Stripe payment intent
-            val url = "http://10.0.2.2:3000/create-payment-intent"
-
-            val postRequest = object : JsonObjectRequest(
-                Method.POST, url, null,
-                Response.Listener { response ->
-
-                    // Handle the response from backend (get clientSecret)
-                    val clientSecret = response.getString("clientSecret")
-
-                    // Initialize Stripe SDK
-                    val stripe = Stripe(requireContext(), "pk_test_51RFeoeKdsoqgvHZObprE6d41umUgO3claXEi7QKzc8lX4LYlLs2v27CISz6XGrqEktrLvL3cWwml4cgr4Vlf8dB600SEzYpv6Q") // Replace with your actual public key
-
-                    // Create PaymentIntent params (you can collect payment method from the Stripe Elements in a real app)
-                    val paymentMethodId = "pm_card_visa"
-                    val paymentIntentParams = ConfirmPaymentIntentParams.createWithPaymentMethodId(paymentMethodId, clientSecret)
-
-                    // Confirm the payment intent with the Stripe SDK
-                    stripe.confirmPayment(this, paymentIntentParams)
-
-                    // Show the AlertDialog after payment is confirmed
-                    val alertDialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Confirm Top-Up")
-                        .setMessage("Are you sure you want to top up ₱$totalDeposit?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            // Handle successful top-up and update Firebase
-                            val auth = FirebaseAuth.getInstance()
-                            val userId = auth.currentUser?.uid
-
-                            if (userId != null) {
-                                val dbRef = FirebaseFirestore.getInstance().collection("UserWallet").document(userId)
-                                val topUpRef = FirebaseFirestore.getInstance().collection("UserTopUp").document(userId)
-
-                                dbRef.get().addOnSuccessListener { documentSnapshot ->
-                                    if (documentSnapshot.exists()) {
-                                        val currentBalance = documentSnapshot.getDouble("balance") ?: 0.0
-                                        val loaned = documentSnapshot.getBoolean("loaned") ?: false
-                                        val newBalance = currentBalance + totalDeposit.toDouble()
-
-                                        val updates = hashMapOf<String, Any>(
-                                            "balance" to newBalance,
-                                            "lastUpdated" to System.currentTimeMillis()
-                                        )
-
-                                        val tax = totalDeposit.toDouble() * 0.10
-                                        val topUpAmount = totalDeposit.toDouble()
-                                        val totalCost = topUpAmount + tax
-
-                                        topUpRef.get().addOnSuccessListener { snapshot ->
-                                            val existingTopup = snapshot.data ?: emptyMap<String, Any>()
-                                            val count = existingTopup.size
-                                            val topUpId = "TU-" + String.format("%04d", count + 1)
-
-                                            val timestamp = Timestamp.now()
-                                            val date = timestamp.toDate()
-
-                                            val sdf = SimpleDateFormat("M/d/yyyy h:mm a", Locale.getDefault())
-                                            val formattedDate = sdf.format(date)
-
-                                            val newTopUp = mapOf(
-                                                "dateTime" to formattedDate,
-                                                "tax" to tax,
-                                                "topUpAmount" to topUpAmount,
-                                                "totalCost" to totalCost
-                                            )
-
-                                            val updateMap = mapOf(topUpId to newTopUp)
-
-                                            topUpRef.set(updateMap, SetOptions.merge())
-                                                .addOnCompleteListener { task ->
-                                                    if (task.isSuccessful) {
-                                                        Log.d("Top Up", "Successful Record")
-                                                    } else {
-                                                        Log.d("Top Up", "Failure to Record")
-                                                    }
-                                                }
-                                        }
-
-                                        if (loaned) {
-                                            updates["loaned"] = false
-                                        }
-
-                                        dbRef.update(updates)
-                                            .addOnSuccessListener {
-                                                Toast.makeText(requireContext(), "Wallet updated successfully", Toast.LENGTH_SHORT).show()
-                                            }
-                                            .addOnFailureListener {
-                                                Toast.makeText(requireContext(), "Failed to update wallet", Toast.LENGTH_SHORT).show()
-                                            }
-
-                                    } else {
-                                        Toast.makeText(requireContext(), "Wallet not found", Toast.LENGTH_SHORT).show()
-                                    }
-                                }.addOnFailureListener {
-                                    Toast.makeText(requireContext(), "Failed to read wallet", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                        .setNegativeButton("No", null)
-                        .create()
-
-                    alertDialog.show()
-                },
-                Response.ErrorListener { error ->
-                    Log.d("Server Error", error.message.toString())
-                    Toast.makeText(requireContext(), "Server Error: ${error.message}", Toast.LENGTH_SHORT).show()
-                }
-            ) {
-                override fun getHeaders(): MutableMap<String, String> {
-                    val headers = HashMap<String, String>()
-                    headers["Content-Type"] = "application/json"
-                    return headers
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w("FCM", "Fetching FCM token failed", task.exception)
+                    Toast.makeText(requireContext(), "Failed to get FCM token", Toast.LENGTH_SHORT).show()
+                    return@addOnCompleteListener
                 }
 
-                override fun getBody(): ByteArray {
-                    val params = JSONObject()
-                    params.put("userId", FirebaseAuth.getInstance().currentUser?.uid ?: "")
-                    params.put("amount", totalDeposit)
-                    return params.toString().toByteArray()
+                val fcmToken = task.result
+                val phpAmount = totalDeposit.toDouble()
+                val usdAmount = ceil(phpAmount / 56)
+                val totalAmountWithFee = usdAmount + ceil(usdAmount * 0.10)
+
+                val url = "http://10.0.2.2:3000/create-payment-intent"
+                val params = JSONObject().apply {
+                    put("userId", FirebaseAuth.getInstance().currentUser?.uid ?: "")
+                    put("amount", totalAmountWithFee.toInt())
+                    put("fcmToken", fcmToken)
                 }
+
+                val postRequest = object : JsonObjectRequest(
+                    Method.POST, url, params,
+                    Response.Listener { response ->
+                        clientSecret = response.getString("clientSecret")
+
+                        val configuration = com.stripe.android.paymentsheet.PaymentSheet.Configuration(
+                            merchantDisplayName = "GoFare Top-Up",
+                            allowsDelayedPaymentMethods = true
+                        )
+
+                        paymentSheet.presentWithPaymentIntent(clientSecret, configuration)
+                    },
+                    Response.ErrorListener { error ->
+                        Log.e("Server Error", error.message ?: "Unknown error")
+                        Toast.makeText(requireContext(), "Server Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    override fun getHeaders(): MutableMap<String, String> {
+                        val headers = HashMap<String, String>()
+                        headers["Content-Type"] = "application/json"
+                        return headers
+                    }
+                }
+
+                Volley.newRequestQueue(requireContext()).add(postRequest)
             }
-
-            val requestQueue = Volley.newRequestQueue(requireContext())
-            requestQueue.add(postRequest)
         }
     }
+
+
+    private fun onPaymentSheetResult(paymentResult: com.stripe.android.paymentsheet.PaymentSheetResult) {
+        when (paymentResult) {
+            is com.stripe.android.paymentsheet.PaymentSheetResult.Completed -> {
+                val auth = FirebaseAuth.getInstance()
+                val userId = auth.currentUser?.uid
+
+                if (userId != null) {
+                    val dbRef = FirebaseFirestore.getInstance().collection("UserWallet").document(userId)
+                    val topUpRef = FirebaseFirestore.getInstance().collection("UserTopUp").document(userId)
+
+                    dbRef.get().addOnSuccessListener { documentSnapshot ->
+                        if (documentSnapshot.exists()) {
+                            val currentBalance = documentSnapshot.getDouble("balance") ?: 0.0
+                            val loaned = documentSnapshot.getBoolean("loaned") ?: false
+                            val newBalance = currentBalance + totalDeposit.toDouble()
+
+                            val updates = hashMapOf<String, Any>(
+                                "balance" to newBalance,
+                                "lastUpdated" to System.currentTimeMillis()
+                            )
+
+                            val phpAmount = totalDeposit.toDouble()
+                            val usdAmount = ceil(phpAmount / 56)
+                            val taxedUsd = usdAmount * 0.10
+
+                            val tax = ceil(taxedUsd * 56)
+                            val topUpAmount = ceil(usdAmount * 56)
+                            val totalCost = ceil((usdAmount + taxedUsd) * 56)
+
+                            topUpRef.get().addOnSuccessListener { snapshot ->
+                                val existingTopup = snapshot.data ?: emptyMap<String, Any>()
+                                val count = existingTopup.size
+                                val topUpId = "TU-" + String.format("%04d", count + 1)
+
+                                val timestamp = Timestamp.now()
+                                val date = timestamp.toDate()
+
+                                val sdf = SimpleDateFormat("M/d/yyyy h:mm a", Locale.getDefault())
+                                val formattedDate = sdf.format(date)
+
+                                val newTopUp = mapOf(
+                                    "dateTime" to formattedDate,
+                                    "tax" to tax,
+                                    "topUpAmount" to topUpAmount,
+                                    "totalCost" to totalCost
+                                )
+
+                                val updateMap = mapOf(topUpId to newTopUp)
+
+                                topUpRef.set(updateMap, SetOptions.merge())
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            Log.d("Top Up", "Successful Record")
+                                        } else {
+                                            Log.d("Top Up", "Failure to Record")
+                                        }
+                                    }
+                            }
+
+                            if (loaned) {
+                                updates["loaned"] = false
+                            }
+
+                            dbRef.update(updates)
+                                .addOnSuccessListener {
+                                    Toast.makeText(requireContext(), "Wallet updated successfully", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(requireContext(), "Failed to update wallet", Toast.LENGTH_SHORT).show()
+                                }
+
+                        } else {
+                            Toast.makeText(requireContext(), "Wallet not found", Toast.LENGTH_SHORT).show()
+                        }
+                    }.addOnFailureListener {
+                        Toast.makeText(requireContext(), "Failed to read wallet", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                Toast.makeText(requireContext(), "Payment successful!", Toast.LENGTH_SHORT).show()
+            }
+            is com.stripe.android.paymentsheet.PaymentSheetResult.Canceled -> {
+                Toast.makeText(requireContext(), "Payment canceled", Toast.LENGTH_SHORT).show()
+            }
+            is com.stripe.android.paymentsheet.PaymentSheetResult.Failed -> {
+                Toast.makeText(requireContext(), "Payment failed: ${paymentResult.error.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
 }

@@ -41,7 +41,6 @@ class TopUpHistoryFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         adapter = TopUpHistoryAdapter(topUpHistoryList) { selectedTopUp ->
-            // OPTIONAL: Add details fragment if needed
             val receiptFragment = TopUpReceiptFragment.newInstance(selectedTopUp)
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, receiptFragment)
@@ -50,7 +49,7 @@ class TopUpHistoryFragment : Fragment() {
         }
 
         recyclerView.adapter = adapter
-//        promptTopUp = view.findViewById(R.id.promptTopUp)
+        promptTopUp = view.findViewById(R.id.promptTopUp)
 
         getTopUpHistory()
 
@@ -61,6 +60,13 @@ class TopUpHistoryFragment : Fragment() {
         val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
         viewModel.startLive()
 
+        viewModel.topUp.observe(viewLifecycleOwner) { topUp ->
+            if (topUp.size == 0) {
+                promptTopUp.visibility = View.VISIBLE
+            } else {
+                promptTopUp.visibility = View.GONE
+            }
+        }
         viewModel.topUp.observe(viewLifecycleOwner) { history ->
             adapter.updateTopUpHistory(history)
         }

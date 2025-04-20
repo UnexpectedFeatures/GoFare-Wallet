@@ -42,7 +42,6 @@ class TransactionsFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rvTransaction)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        // Setup adapter with empty list for now
         adapter = TransactionAdapter(transactionList) { selectedTransaction ->
             val receiptFragment = ReceiptFragment.newInstance(selectedTransaction)
             requireActivity().supportFragmentManager.beginTransaction()

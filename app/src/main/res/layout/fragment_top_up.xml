@@ -24,7 +24,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginStart="16dp"
         android:background="@drawable/background_white_full"
         android:gravity="start"
         android:orientation="vertical"
@@ -35,6 +34,7 @@
 
         <TextView
             android:id="@+id/title"
+            android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
