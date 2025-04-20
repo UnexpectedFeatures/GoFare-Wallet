@@ -11,9 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.gofare.databinding.FragmentTopUpBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -32,6 +30,14 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Objects
 import kotlin.math.ceil
+import okio.ByteString
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okhttp3.Response
+
+
 
 
 class TopUpFragment : Fragment() {
@@ -44,11 +50,6 @@ class TopUpFragment : Fragment() {
     private lateinit var paymentSheet: com.stripe.android.paymentsheet.PaymentSheet
 
     private lateinit var clientSecret: String
-    private var totalAmountWithFee: Double = 0.0
-    private var usdAmount: Double = 0.0
-    private var taxedUsd: Double = 0.0
-    private var totalCostPhp: Double = 0.0
-    private var fcmToken : String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +71,7 @@ class TopUpFragment : Fragment() {
 
         PaymentConfiguration.init(
             requireContext(),
-            "pk_test_51RFeoeKdsoqgvHZObprE6d41umUgO3claXEi7QKzc8lX4LYlLs2v27CISz6XGrqEktrLvL3cWwml4cgr4Vlf8dB600SEzYpv6Q"
+            "pk_test_51RFWOBBLDZkRasaW9U1JVUm4b00HYbwwGuOWi2RZy9g4C58BshODQfbuX6akLQRA967OMqzwIDzAbtwwfYCbh5u800D1xCS6Db"
         )
 
         // Then initialize your PaymentSheet
@@ -121,42 +122,27 @@ class TopUpFragment : Fragment() {
                 val usdAmount = ceil(phpAmount / 56)
                 val totalAmountWithFee = usdAmount + ceil(usdAmount * 0.10)
 
-                val url = "http://10.0.2.2:3000/create-payment-intent"
-                val params = JSONObject().apply {
+                // THIS IS CAPS SO ITS EASIER TO NOTICE
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url("ws://10.0.2.2:3003")
+                    .build()
+
+                val webSocketListener = WebsocketConnection(requireActivity(), paymentSheet)
+                val webSocket = client.newWebSocket(request, webSocketListener)
+
+                val socketMessage = JSONObject().apply {
+                    put("event", "createPayment")
                     put("userId", FirebaseAuth.getInstance().currentUser?.uid ?: "")
                     put("amount", totalAmountWithFee.toInt())
                     put("fcmToken", fcmToken)
                 }
 
-                val postRequest = object : JsonObjectRequest(
-                    Method.POST, url, params,
-                    Response.Listener { response ->
-                        clientSecret = response.getString("clientSecret")
+                webSocket.send(socketMessage.toString())
 
-                        val configuration = com.stripe.android.paymentsheet.PaymentSheet.Configuration(
-                            merchantDisplayName = "GoFare Top-Up",
-                            allowsDelayedPaymentMethods = true
-                        )
-
-                        paymentSheet.presentWithPaymentIntent(clientSecret, configuration)
-                    },
-                    Response.ErrorListener { error ->
-                        Log.e("Server Error", error.message ?: "Unknown error")
-                        Toast.makeText(requireContext(), "Server Error: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
-                ) {
-                    override fun getHeaders(): MutableMap<String, String> {
-                        val headers = HashMap<String, String>()
-                        headers["Content-Type"] = "application/json"
-                        return headers
-                    }
-                }
-
-                Volley.newRequestQueue(requireContext()).add(postRequest)
             }
         }
     }
-
 
     private fun onPaymentSheetResult(paymentResult: com.stripe.android.paymentsheet.PaymentSheetResult) {
         when (paymentResult) {
