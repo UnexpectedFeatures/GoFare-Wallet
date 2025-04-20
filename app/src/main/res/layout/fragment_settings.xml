@@ -300,6 +300,23 @@
                     android:paddingVertical="8dp">
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/topUpHistoryBtn"
+                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginVertical="4dp"
+                        android:backgroundTint="@color/white"
+                        android:text="TopUp History"
+                        android:textAlignment="viewStart"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:icon="@drawable/lock"
+                        app:iconPadding="80dp"
+                        app:iconTint="@color/black" />
+
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/privacyButton"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
                         android:layout_width="match_parent"

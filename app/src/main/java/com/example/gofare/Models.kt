@@ -49,3 +49,13 @@ data class UserRequest(
     val type: String? = null,
     val requestId: String? = null,
 ): Parcelable
+
+@Parcelize
+data class TopUpHistory(
+    val topUpId: String? = null,
+    val dateTime: String? = null,
+    val totalAmount: Double = 0.0,
+    val topUpAmount: Double = 0.0,
+    val tax: Double = 0.0
+): Parcelable
+

@@ -49,6 +49,7 @@
             android:id="@+id/firstNameLabel"
             android:layout_width="match_parent"
             android:layout_height="24dp"
+            android:textColor="@color/black"
             android:text="First Name:"
             android:textSize="16dp" />
 

@@ -21,6 +21,7 @@ class SharedViewModel : ViewModel() {
     private val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID")
     private val transactionRef = FirebaseFirestore.getInstance().collection("UserTransaction")
     private val requestsRef = FirebaseFirestore.getInstance().collection("UserRequests")
+    private val topUpRef = FirebaseFirestore.getInstance().collection("UserTopUp")
 
     private var usersListener: ValueEventListener? = null
     private var transactionListener: ValueEventListener? = null
@@ -86,6 +87,10 @@ class SharedViewModel : ViewModel() {
     private val _requests = MutableLiveData<List<UserRequest>>()
     val requests: LiveData<List<UserRequest>> get() = _requests
 
+    // User Requests
+    private val _topUp = MutableLiveData<List<TopUpHistory>>()
+    val topUp: LiveData<List<TopUpHistory>> get() = _topUp
+
     // Current User RFID
     private val _rfid = MutableLiveData<String>()
     val rfid: LiveData<String> get() = _rfid
@@ -110,7 +115,42 @@ class SharedViewModel : ViewModel() {
             observeUserRequests()
             observeUserTransactions()
             obeserveUserWallet()
+            observeTopUpHistory()
         }
+    }
+
+    fun observeTopUpHistory(){
+        if (userId != null){
+            topUpRef.document(userId).addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("FirebaseData", "Error fetching user top up", error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val allTopUp = mutableListOf<TopUpHistory>()
+                    for ((topUpId, value) in snapshot.data ?: emptyMap()) {
+                        val data = value as? Map<*, *> ?: continue
+                        val topUp = TopUpHistory(
+                            topUpId = topUpId,
+                            dateTime = data["dateTime"] as? String ?: "",
+                            tax = (data["tax"] as? Number)?.toDouble() ?: 0.0,
+                            topUpAmount = (data["topUpAmount"] as? Number)?.toDouble() ?: 0.0,
+                            totalAmount = (data["totalCost"] as? Number)?.toDouble() ?: 0.0
+                        )
+                        allTopUp.add(topUp)
+                    }
+                    _topUp.value = allTopUp
+                    Log.d("FirebaseData", "Observed ${allTopUp.size} Top Up.")
+                } else {
+                    Log.d("FirebaseData", "Document doesn't exist for userId: $userId")
+                }
+            }
+        }
+        else {
+            Log.d("FirebaseData", "User document does not exist")
+        }
+
     }
 
     fun observeUserRequests(){

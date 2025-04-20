@@ -47,10 +47,15 @@ class TopUpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         requestQueue = Volley.newRequestQueue(requireContext())
 
-        backBtn = view.findViewById(R.id.backBtn)
-        backBtn.setOnClickListener{
+        binding.backBtn.setOnClickListener{
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, HomeFragment())
+                .commit()
+        }
+
+        binding.historyBtn.setOnClickListener{
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, TopUpHistoryFragment())
                 .commit()
         }
 
