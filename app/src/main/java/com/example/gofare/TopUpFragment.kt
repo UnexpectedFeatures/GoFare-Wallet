@@ -125,7 +125,7 @@ class TopUpFragment : Fragment() {
                 // THIS IS CAPS SO ITS EASIER TO NOTICE
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("ws://10.0.2.2:3003")
+                    .url("ws://172.20.10.5:3003")
                     .build()
 
                 val webSocketListener = WebsocketConnection(requireActivity(), paymentSheet)

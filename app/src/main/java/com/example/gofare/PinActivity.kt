@@ -25,6 +25,8 @@ class PinActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+
         // Initialize ViewBinding and set it as content view
         binding = ActivityPinBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -39,6 +41,8 @@ class PinActivity : AppCompatActivity() {
             )
             startActivity(intent)
         }
+
+        displayEmail()
 
         val pinFields = listOf(
             binding.pin1, binding.pin2, binding.pin3,
@@ -69,7 +73,6 @@ class PinActivity : AppCompatActivity() {
             assignId(btn, pinFields)
         }
 
-        displayEmail()
     }
 
     private fun displayEmail() {
@@ -77,13 +80,8 @@ class PinActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid
 
         if (userId != null) {
-            val viewModel = ViewModelProvider(this)[SharedViewModel::class.java]
-            viewModel.observeUserData()
+                binding.emailButton.setText(auth.currentUser?.email.toString())
 
-            // Assuming viewModel.email is a LiveData<String>
-            viewModel.email.observe(this) { email ->
-                binding.emailButton.text = email
-            }
         } else {
             binding.emailButton.text = "No User"
         }
