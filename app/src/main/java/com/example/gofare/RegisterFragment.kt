@@ -4,12 +4,14 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
@@ -31,10 +33,11 @@ class RegisterFragment : Fragment() {
     lateinit var passwordTxt : EditText
     lateinit var confirmPasswordTxt : EditText
     lateinit var signUpBtn : com.google.android.material.button.MaterialButton
+    private lateinit var togglePasswordBtn: ImageButton
+    private lateinit var toggleConfirmPasswordBtn: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,6 +54,8 @@ class RegisterFragment : Fragment() {
         passwordTxt = view.findViewById(R.id.passwordEditText)
         confirmPasswordTxt = view.findViewById(R.id.confirmPasswordEditText)
         signUpBtn = view.findViewById(R.id.signUpBtn)
+        togglePasswordBtn = view.findViewById(R.id.togglePasswordBtn)
+        toggleConfirmPasswordBtn = view.findViewById(R.id.toggleConfirmPasswordBtn)
 
         toLogin.setOnClickListener {
             val intent = Intent(
@@ -58,6 +63,35 @@ class RegisterFragment : Fragment() {
                 MainActivity::class.java
             )
             startActivity(intent)
+        }
+
+        var isPasswordVisible = false
+        var isConfirmPasswordVisible = false
+
+        togglePasswordBtn.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+
+            if (isPasswordVisible) {
+                passwordTxt.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePasswordBtn.setImageResource(R.drawable.eye)
+            } else {
+                passwordTxt.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePasswordBtn.setImageResource(R.drawable.eye_closed)
+            }
+            passwordTxt.setSelection(passwordTxt.text.length)
+        }
+
+        toggleConfirmPasswordBtn.setOnClickListener {
+            isConfirmPasswordVisible = !isConfirmPasswordVisible
+
+            if (isConfirmPasswordVisible) {
+                confirmPasswordTxt.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                togglePasswordBtn.setImageResource(R.drawable.eye)
+            } else {
+                confirmPasswordTxt.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                togglePasswordBtn.setImageResource(R.drawable.eye_closed)
+            }
+            confirmPasswordTxt.setSelection(confirmPasswordTxt.text.length)
         }
 
         birthdayText.setOnClickListener {
@@ -85,9 +119,21 @@ class RegisterFragment : Fragment() {
 
             val birthday = birthdayText.text.toString().trim()
 
+            val birthYear = try {
+                birthday.takeLast(4).toInt()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Invalid birthday format!", Toast.LENGTH_SHORT).show()
+                return@OnClickListener
+            }
+
             val currentYear = Calendar.getInstance().get(Calendar.YEAR)
-            val birthYear = birthday.substring(birthday.length - 4).toInt()
             val age = currentYear - birthYear
+
+            if (age < 7 || age > 120) {
+                Toast.makeText(requireContext(), "Age must be between 7 and 120!", Toast.LENGTH_SHORT).show()
+                return@OnClickListener
+            }
+
             val address = addressTxt.text.toString().trim()
             val contactNumber = contactTxt.text.toString().replace("+", "").replace("-", "").replace(" ", "")
             val email = emailTxt.text.toString().trim()
@@ -101,6 +147,12 @@ class RegisterFragment : Fragment() {
                 ""
             }
 
+            val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,20}\$")
+
+            if (!password.matches(passwordRegex)) {
+                Toast.makeText(requireContext(), "Password must be 8–20 characters long and include uppercase, lowercase, digit, and special character.", Toast.LENGTH_SHORT).show()
+                return@OnClickListener
+            }
             if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || selectedGenderId == 1) {
                 Toast.makeText(requireContext(), "Please fill all required fields!", Toast.LENGTH_SHORT).show()
                 return@OnClickListener
@@ -137,7 +189,6 @@ class RegisterFragment : Fragment() {
                                     putString("email", email)
                                     putString("password", password)
                                 }
-
 
                                 val registerEmailFragment = RegisterEmailFragment()
                                 registerEmailFragment.arguments = bundle

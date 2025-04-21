@@ -220,7 +220,6 @@
             android:paddingHorizontal="8dp"
             android:textColor="@color/black" />
 
-
         <TextView
             android:id="@+id/passwordLabel"
             android:layout_width="match_parent"
@@ -229,17 +228,34 @@
             android:textColor="@color/black"
             android:textSize="16dp" />
 
-        <EditText
-            android:id="@+id/passwordEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/textbox_stroke"
-            android:ems="10"
-            android:hint="userpassword"
-            android:inputType="textPassword"
-            android:paddingHorizontal="8dp"
-            android:textColor="@color/black" />
+            android:layout_marginBottom="20dp">
+
+                <EditText
+                    android:id="@+id/passwordEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="8"
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="userpassword"
+                    android:inputType="textPassword"
+                    android:paddingHorizontal="8dp"
+                    android:textColor="@color/black" />
+
+                <ImageButton
+                    android:id="@+id/togglePasswordBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:contentDescription="toggleVisibility"
+                    android:src="@drawable/eye_closed" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/confirmPasswordLabel"
@@ -249,16 +265,34 @@
             android:textColor="@color/black"
             android:textSize="16dp" />
 
-        <EditText
-            android:id="@+id/confirmPasswordEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/textbox_stroke"
-            android:ems="10"
-            android:hint="userpassword"
-            android:inputType="textPassword"
-            android:paddingHorizontal="8dp"
-            android:textColor="@color/black" />
+            android:layout_marginBottom="20dp">
+
+                <EditText
+                    android:id="@+id/confirmPasswordEditText"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="8"
+                    android:background="@drawable/textbox_stroke"
+                    android:ems="10"
+                    android:hint="userpassword"
+                    android:inputType="textPassword"
+                    android:paddingHorizontal="8dp"
+                    android:textColor="@color/black" />
+
+                <ImageButton
+                    android:id="@+id/toggleConfirmPasswordBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:contentDescription="toggleVisibility"
+                    android:src="@drawable/eye_closed" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

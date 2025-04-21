@@ -126,7 +126,7 @@ class ReceiptFragment : Fragment() {
 
         builder.setView(container)
 
-        builder.setPositiveButton("OK") { dialog, _ ->
+         builder.setPositiveButton("OK") { dialog, _ ->
             val userInput = input.text.toString()
             val auth = FirebaseAuth.getInstance()
             val userId = auth.currentUser?.uid
