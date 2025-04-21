@@ -80,7 +80,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(
                 this@MainActivity,
                 ForgotPasswordActivity::class.java
-//                PinActivity::class.java
             )
             startActivity(intent)
         })

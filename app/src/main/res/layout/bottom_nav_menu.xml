@@ -5,9 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:gravity="center|start"
     android:orientation="horizontal"
+    android:background="@color/white"
     android:paddingHorizontal="8dp"
     tools:context=".HomeActivity"
     >

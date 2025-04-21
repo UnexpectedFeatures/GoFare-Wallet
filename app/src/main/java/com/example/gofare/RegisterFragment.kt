@@ -21,7 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterFragment : Fragment() {
 
-    lateinit var toLogin : com.google.android.material.button.MaterialButton
+    lateinit var toLogin : ImageButton
     lateinit var firstNameTxt : EditText
     lateinit var lastNameTxt : EditText
     lateinit var middleNameTxt : EditText

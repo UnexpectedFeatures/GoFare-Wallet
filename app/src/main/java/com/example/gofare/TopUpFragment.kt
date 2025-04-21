@@ -167,7 +167,7 @@ class TopUpFragment : Fragment() {
                             val topUpAmount = ceil(usdAmount * 56)
                             val totalCost = ceil((usdAmount + taxedUsd) * 56)
 
-                            val newBalance = currentBalance + totalCost
+                            val newBalance = currentBalance + topUpAmount
 
                             val updates = hashMapOf<String, Any>(
                                 "balance" to newBalance,

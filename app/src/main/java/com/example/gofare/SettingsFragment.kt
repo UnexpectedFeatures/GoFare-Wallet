@@ -53,7 +53,6 @@ class SettingsFragment : Fragment() {
         logoutButton = view.findViewById(R.id.logoutButton)
         topUpHistoryButton = view.findViewById(R.id.topUpHistoryBtn)
         editProfile = view.findViewById(R.id.editProfileButton)
-        swNotification = view.findViewById(R.id.swNotification)
         stFullName = view.findViewById(R.id.stFullName)
         stEmail = view.findViewById(R.id.stEmail)
         userVerified = view.findViewById(R.id.userVerified)
@@ -71,11 +70,6 @@ class SettingsFragment : Fragment() {
                 userVerified.text = "Verified"
                 userVerified.setTextColor(Color.BLACK)
             }
-        }
-
-        swNotification.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setNotificationsEnabled(isChecked)
-            Toast.makeText(requireContext(), "Notifications: $isChecked", Toast.LENGTH_SHORT).show()
         }
 
         editProfile.setOnClickListener {

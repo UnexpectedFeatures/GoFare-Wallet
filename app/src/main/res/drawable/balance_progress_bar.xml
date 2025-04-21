@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background circle -->
+    <item>
+        <shape xmlns:android="http://schemas.android.com/apk/res/android">
+            <solid android:color="@color/powder_blue"/> <!-- Light gray background -->
+            <corners android:radius="100dp"/> <!-- Circle shape -->
+        </shape>
+    </item>
+
+    <!-- Progress circle -->
+    <item>
+        <rotate
+            android:fromDegrees="270"
+            android:toDegrees="630">
+            <shape xmlns:android="http://schemas.android.com/apk/res/android">
+                <solid android:color="@color/apricot"/> <!-- Your desired progress color -->
+                <corners android:radius="100dp"/>
+            </shape>
+        </rotate>
+    </item>
+</layer-list>
