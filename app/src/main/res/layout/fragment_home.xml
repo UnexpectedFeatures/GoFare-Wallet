@@ -97,6 +97,17 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/scanNFCBtn"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="end"
+                android:layout_margin="4dp"
+                android:background="@drawable/ripple_apricot_circle"
+                android:src="@drawable/ic_nfc"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
                 android:id="@+id/topUpBtn"
                 android:layout_width="52dp"
                 android:layout_height="52dp"

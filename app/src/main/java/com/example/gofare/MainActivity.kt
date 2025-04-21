@@ -19,7 +19,9 @@ import android.widget.Toast.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,22 +37,6 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel()
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-
-        // In Development!!
-        if (intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED) {
-            val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent?.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                intent?.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-            }
-            if (tag != null) {
-                Toast.makeText(this, "Device does not support NFC", Toast.LENGTH_SHORT).show()
-            }
-            else{
-                Toast.makeText(this, "NFC: " + tag, Toast.LENGTH_SHORT).show()
-            }
-        }
 
         toRegister = findViewById(R.id.toRegister)
         usernameInput = findViewById(R.id.usernameEditText)
@@ -124,6 +110,58 @@ class MainActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     makeText(this, "Log In Success", LENGTH_SHORT).show()
                     Log.d("Firebase", "Login Successful")
+
+                    Log.d("NFC Start", "NFC Check Starting")
+
+                    if (intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED) {
+                        val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+                        }
+
+                        if (tag != null) {
+                            val tagId = tag.id.joinToString("") { "%02X".format(it) }
+                            Log.d("NFC Tag", "Tag Detected: $tagId")
+
+                            val userId = auth.currentUser?.uid
+                            if (userId == null) {
+                                Log.d("NFC Error", "User not authenticated")
+                                return@addOnCompleteListener
+                            }
+
+                            val dynamicNfcRef = FirebaseFirestore.getInstance().collection("UserDynamicNFC").document(userId)
+
+                            dynamicNfcRef.get().addOnSuccessListener { document ->
+                                val previousId = document.getString("nfcId") ?: ""
+                                Log.d("NFC Firestore", "Previous ID: $previousId")
+
+                                if (previousId != tagId) {
+                                    val nfcUpdate = mapOf(
+                                        "nfcId" to tagId,
+                                        "previousId" to previousId,
+                                        "updatedAt" to Timestamp.now()
+                                    )
+                                    dynamicNfcRef.set(nfcUpdate)
+                                        .addOnSuccessListener {
+                                            Log.d("NFC Firestore", "NFC updated successfully")
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e("NFC Firestore", "Failed to update NFC", it)
+                                        }
+                                } else {
+                                    Log.d("NFC Firestore", "Same tag as previous — no update needed")
+                                }
+                            }.addOnFailureListener {
+                                Log.e("NFC Firestore", "Failed to read document", it)
+                            }
+                        } else {
+                            Toast.makeText(this, "Device does not support NFC", Toast.LENGTH_SHORT).show()
+                            Log.d("NFC Tag", "Tag is null")
+                        }
+                    }
+
                     val intent = Intent(
                         this@MainActivity,
                         PinActivity::class.java

@@ -21,6 +21,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var tvBalance: TextView
     private lateinit var tvCurrency: TextView
     private lateinit var topUpBtn: ImageButton
+    private lateinit var scanNFCBtn: ImageButton
 
     private lateinit var pickup: TextView
     private lateinit var dropoff: TextView
@@ -45,6 +46,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         tvBalance = view.findViewById(R.id.tvBalance)
         tvCurrency = view.findViewById(R.id.tvCurrency)
         topUpBtn = view.findViewById(R.id.topUpBtn)
+        scanNFCBtn = view.findViewById(R.id.scanNFCBtn)
 
         pickup = view.findViewById(R.id.pickup)
         dropoff = view.findViewById(R.id.dropoff)
@@ -56,6 +58,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .replace(R.id.fragment_container, TopUpFragment())
                 .commit()
         }
+        scanNFCBtn.setOnClickListener{
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ScanFragment())
+                .commit()
+        }
+
+
+
         displayUserData()
         displayOverview()
     }

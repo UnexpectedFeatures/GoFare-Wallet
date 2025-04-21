@@ -16,13 +16,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import android.Manifest
 import android.content.pm.PackageManager
-import android.nfc.NfcAdapter
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 class HomeActivity : AppCompatActivity() {
 
-    private var nfcAdapter: NfcAdapter? = null
 
     private lateinit var HomeButton: ImageButton
     private lateinit var SettingsButton: ImageButton
@@ -36,7 +34,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         viewModel = ViewModelProvider(this)[SharedViewModel::class.java]
 
         val auth = FirebaseAuth.getInstance()
@@ -81,9 +78,7 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel.rfid.observe(this) { rfid ->
             if (rfid.isNullOrEmpty()) {
-                if (nfcAdapter == null){
-                    TransactionsButton.visibility = View.GONE
-                }
+                TransactionsButton.visibility = View.GONE
             } else {
                 TransactionsButton.visibility = View.VISIBLE
             }
