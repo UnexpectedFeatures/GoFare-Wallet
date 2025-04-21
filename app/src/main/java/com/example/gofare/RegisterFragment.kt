@@ -86,10 +86,10 @@ class RegisterFragment : Fragment() {
 
             if (isConfirmPasswordVisible) {
                 confirmPasswordTxt.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                togglePasswordBtn.setImageResource(R.drawable.eye)
+                toggleConfirmPasswordBtn.setImageResource(R.drawable.eye)
             } else {
                 confirmPasswordTxt.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                togglePasswordBtn.setImageResource(R.drawable.eye_closed)
+                toggleConfirmPasswordBtn.setImageResource(R.drawable.eye_closed)
             }
             confirmPasswordTxt.setSelection(confirmPasswordTxt.text.length)
         }
@@ -139,6 +139,10 @@ class RegisterFragment : Fragment() {
             val email = emailTxt.text.toString().trim()
             val password = passwordTxt.text.toString().trim()
             val confirmPassword = confirmPasswordTxt.text.toString().trim()
+
+            if (contactNumber.length < 3 || contactNumber.length > 11){
+                Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
+            }
 
             val selectedGenderId = genderRadioGrp.checkedRadioButtonId
             val gender = if (selectedGenderId != -1) {

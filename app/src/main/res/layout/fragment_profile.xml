@@ -98,6 +98,7 @@
                         android:enabled="false"
                         android:gravity="start|center"
                         android:maxLines="1"
+                        android:paddingHorizontal="8dp"
                         android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold"
@@ -121,8 +122,8 @@
                         android:layout_marginHorizontal="16dp"
                         android:ellipsize="end"
                         android:enabled="false"
-                        
                         android:gravity="start|center"
+                        android:paddingHorizontal="8dp"
                         android:maxLines="1"
                         android:textColor="@color/black"
                         android:textSize="16sp"
@@ -145,10 +146,10 @@
                         android:layout_marginHorizontal="16dp"
                         android:ellipsize="end"
                         android:enabled="false"
-                        
                         android:gravity="start|center"
                         android:background="@drawable/stroke_bg_white"
                         android:maxLines="1"
+                        android:paddingHorizontal="8dp"
                         android:textColor="@color/black"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -183,7 +184,7 @@
                         android:ellipsize="end"
                         android:background="@drawable/stroke_bg_white"
                         android:enabled="false"
-                        
+                        android:paddingHorizontal="8dp"
                         android:gravity="start|center"
                         android:maxLines="1"
                         android:textColor="@color/black"
@@ -207,7 +208,7 @@
                         android:layout_marginHorizontal="16dp"
                         android:ellipsize="end"
                         android:enabled="false"
-                        
+                        android:paddingHorizontal="8dp"
                         android:gravity="start|center"
                         android:background="@drawable/stroke_bg_white"
                         android:maxLines="1"
@@ -233,7 +234,7 @@
                         android:ellipsize="end"
                         android:background="@drawable/stroke_bg_white"
                         android:enabled="false"
-                        
+                        android:paddingHorizontal="8dp"
                         android:gravity="start|center"
                         android:maxLines="1"
                         android:textColor="@color/black"
@@ -285,7 +286,7 @@
                         android:ellipsize="end"
                         android:background="@drawable/stroke_bg_white"
                         android:enabled="false"
-                        
+                        android:paddingHorizontal="8dp"
                         android:gravity="start|center"
                         android:maxLines="1"
                         android:textColor="@color/black"
@@ -310,7 +311,7 @@
                         android:ellipsize="end"
                         android:enabled="false"
                         android:background="@drawable/stroke_bg_white"
-                        
+                        android:paddingHorizontal="8dp"
                         android:gravity="start|center"
                         android:maxLines="1"
                         android:textColor="@color/black"
