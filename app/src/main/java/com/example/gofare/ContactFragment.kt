@@ -144,7 +144,7 @@ class ContactFragment : Fragment() {
             requestRef.get().addOnSuccessListener { snapshot ->
                 val existingRequests = snapshot.data ?: emptyMap<String, Any>()
                 val count = existingRequests.size
-                val requestId = "UR" + String.format("%04d", count + 1)
+                val requestId = "UR-" + String.format("%04d", count + 1)
 
                 val requestMap = mapOf(
                     "requestId" to requestId,

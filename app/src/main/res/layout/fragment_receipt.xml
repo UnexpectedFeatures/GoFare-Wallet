@@ -22,11 +22,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="64dp"
-        android:paddingBottom="32dp"
         android:background="@drawable/background_primary"
         android:gravity="start"
         android:orientation="vertical"
+        android:paddingBottom="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">
@@ -79,8 +78,7 @@
                 <TextView
                     android:id="@+id/pickUp"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:gravity="start"
                     android:paddingHorizontal="16dp"
                     android:text="Destination 1"
@@ -115,8 +113,7 @@
                 <TextView
                     android:id="@+id/dropOff"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
                     android:gravity="start"
                     android:paddingHorizontal="16dp"
                     android:text="Destination 2"

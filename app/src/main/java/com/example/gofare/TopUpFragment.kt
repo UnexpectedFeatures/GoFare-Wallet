@@ -125,7 +125,7 @@ class TopUpFragment : Fragment() {
                 // THIS IS CAPS SO ITS EASIER TO NOTICE
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("ws://172.20.10.5:3003")
+                    .url("ws://192.168.101.220:3003")
                     .build()
 
                 val webSocketListener = WebsocketConnection(requireActivity(), paymentSheet)
@@ -158,12 +158,6 @@ class TopUpFragment : Fragment() {
                         if (documentSnapshot.exists()) {
                             val currentBalance = documentSnapshot.getDouble("balance") ?: 0.0
                             val loaned = documentSnapshot.getBoolean("loaned") ?: false
-                            val newBalance = currentBalance + totalDeposit.toDouble()
-
-                            val updates = hashMapOf<String, Any>(
-                                "balance" to newBalance,
-                                "lastUpdated" to System.currentTimeMillis()
-                            )
 
                             val phpAmount = totalDeposit.toDouble()
                             val usdAmount = ceil(phpAmount / 56)
@@ -173,6 +167,12 @@ class TopUpFragment : Fragment() {
                             val topUpAmount = ceil(usdAmount * 56)
                             val totalCost = ceil((usdAmount + taxedUsd) * 56)
 
+                            val newBalance = currentBalance + totalCost
+
+                            val updates = hashMapOf<String, Any>(
+                                "balance" to newBalance,
+                                "lastUpdated" to System.currentTimeMillis()
+                            )
                             topUpRef.get().addOnSuccessListener { snapshot ->
                                 val existingTopup = snapshot.data ?: emptyMap<String, Any>()
                                 val count = existingTopup.size
