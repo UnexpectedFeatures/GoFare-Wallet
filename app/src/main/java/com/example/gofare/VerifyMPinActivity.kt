@@ -4,87 +4,75 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 
-class VerifyResetFragment : Fragment() {
+class VerifyMPinActivity : AppCompatActivity() {
 
-    private var isVerified = false
     private lateinit var auth: FirebaseAuth
     private lateinit var handler: Handler
     private lateinit var runnable: Runnable
+    private var isVerified = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_verify_mpin)
 
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_verify_reset, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        onBackPressedDispatcher.addCallback(this) {
+            val intent = Intent(this@VerifyMPinActivity, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         auth = FirebaseAuth.getInstance()
-
-        requireActivity()
-
         val user = auth.currentUser
+
         user?.let {
             if (!it.isEmailVerified) {
                 it.sendEmailVerification()
                     .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Verification email sent.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Verification email sent.", Toast.LENGTH_SHORT).show()
                         startVerificationLoop()
                     }
                     .addOnFailureListener { e ->
-                        Toast.makeText(requireContext(), "Failed to send verification email: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Failed to send verification email: ${e.message}", Toast.LENGTH_LONG).show()
                     }
             } else {
-                startVerificationLoop()
+                startVerificationLoop() // Already verified
             }
         }
     }
 
     private fun startVerificationLoop() {
         handler = Handler(Looper.getMainLooper())
-
         runnable = object : Runnable {
             override fun run() {
                 val user = auth.currentUser
                 user?.reload()?.addOnSuccessListener {
                     if (user.isEmailVerified && !isVerified) {
                         isVerified = true
+                        Toast.makeText(this@VerifyMPinActivity, "Email Verified!", Toast.LENGTH_SHORT).show()
 
-                        val mpinFragment = MPinRegisterFragment()
-                        mpinFragment.arguments = arguments
-
-                        parentFragmentManager.beginTransaction()
-                            .replace(R.id.register_frame, mpinFragment)
-                            .commit()
-
+                        val intent = Intent(this@VerifyMPinActivity, ChangeMPinActivity::class.java)
+                        startActivity(intent)
+                        finish()
                     } else {
-                        handler.postDelayed(this, 3000) // try again in 3 seconds
+                        handler.postDelayed(this, 3000)
                     }
                 }
             }
         }
 
-        handler.postDelayed(runnable, 3000) // initial delay
+        handler.postDelayed(runnable, 3000)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         if (::handler.isInitialized) {
             handler.removeCallbacks(runnable)
         }

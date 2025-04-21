@@ -66,6 +66,14 @@ class PinActivity : AppCompatActivity() {
             }
         }
 
+        binding.forgotPin.setOnClickListener{
+            val intent = Intent(
+                this@PinActivity,
+                VerifyMPinActivity::class.java
+            )
+            startActivity(intent)
+        }
+
         pinFields[0].isFocusable = true
         pinFields[0].isFocusableInTouchMode = true
 
