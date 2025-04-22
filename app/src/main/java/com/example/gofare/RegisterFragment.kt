@@ -143,6 +143,9 @@ class RegisterFragment : Fragment() {
             if (contactNumber.length < 3 || contactNumber.length > 11){
                 Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
             }
+            if (contactNumber){
+                Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
+            }
 
             val selectedGenderId = genderRadioGrp.checkedRadioButtonId
             val gender = if (selectedGenderId != -1) {

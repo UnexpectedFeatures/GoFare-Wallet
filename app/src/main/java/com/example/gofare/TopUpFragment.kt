@@ -105,6 +105,24 @@ class TopUpFragment : Fragment() {
         btn.setOnClickListener {
             totalDeposit = btn.text.toString().substring(3).trim()
 
+            if (totalDeposit.toDouble() == 56.0){
+                totalDeposit = "50"
+            }
+            if (totalDeposit.toDouble() == 112.0){
+                totalDeposit = "100"
+            }
+            if (totalDeposit.toDouble() == 1008.0){
+                totalDeposit = "1000"
+            }
+            if (totalDeposit.toDouble() == 1512.0){
+                totalDeposit = "1500"
+            }
+            if (totalDeposit.toDouble() == 2520.0){
+                totalDeposit = "2500"
+            }
+
+
+
             if (totalDeposit.isEmpty()) {
                 Toast.makeText(requireContext(), "Invalid deposit amount", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -205,6 +223,7 @@ class TopUpFragment : Fragment() {
 
                             if (loaned) {
                                 updates["loaned"] = false
+                                updates["loanedAmount"] = 0
                             }
 
                             dbRef.update(updates)

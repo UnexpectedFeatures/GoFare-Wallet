@@ -28,6 +28,7 @@ class ReceiptFragment : Fragment() {
     private lateinit var balance : TextView
     private lateinit var total : TextView
     private lateinit var remainingBalance : TextView
+    private lateinit var remBalTV : TextView
     private lateinit var refundBtn : com.google.android.material.button.MaterialButton
 
     companion object {
@@ -59,6 +60,7 @@ class ReceiptFragment : Fragment() {
         balance = view.findViewById(R.id.balance)
         total = view.findViewById(R.id.total)
         remainingBalance = view.findViewById(R.id.remainingBalance)
+        remBalTV = view.findViewById(R.id.remBalTV)
 
         val transaction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("selectedTransaction", Transaction::class.java)
@@ -78,11 +80,13 @@ class ReceiptFragment : Fragment() {
         Log.d("Transaction: ", transaction.toString())
 
         if (transaction?.loaned == false){
+            remBalTV.setText("Remaining Balance:")
             loaned.visibility = View.GONE
-
         }
         else {
+            remBalTV.setText("Loaned Amount:")
             loaned.visibility = View.VISIBLE
+
         }
         viewModel.currency.observe(viewLifecycleOwner) { currency ->
             transactionId.text = transaction?.transactionId
@@ -92,7 +96,12 @@ class ReceiptFragment : Fragment() {
             dateTime.text = "Date: " + transaction?.dateTime
             balance.text = "$currency " + transaction?.currentBalance.toString()
             total.text = "$currency " + transaction?.totalAmount.toString()
-            remainingBalance.text = "$currency " + transaction?.remainingBalance.toString()
+            if (transaction?.loaned == false){
+                remainingBalance.text = "$currency " + transaction?.remainingBalance.toString()
+            }
+            else{
+                remainingBalance.text = "$currency " + transaction?.loanedAmount.toString()
+            }
         }
 
         refundBtn.setOnClickListener{
