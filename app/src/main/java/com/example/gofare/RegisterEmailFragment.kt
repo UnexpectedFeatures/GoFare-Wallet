@@ -15,6 +15,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 class RegisterEmailFragment : Fragment() {
 
@@ -36,6 +37,22 @@ class RegisterEmailFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             val user = auth.currentUser
             if (user != null){
+                val storage = FirebaseStorage.getInstance().reference.child("studentIds/${user.uid}")
+                storage.listAll()
+                    .addOnSuccessListener { listResult ->
+                        listResult.items.forEach { fileRef ->
+                            fileRef.delete()
+                                .addOnSuccessListener {
+                                    Log.d("Delete", "Deleted: ${fileRef.name}")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Delete", "Error deleting ${fileRef.name}", e)
+                                }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Delete", "Error listing user files", e)
+                    }
                 user.delete()
                 Toast.makeText(requireContext(), "Registration Aborted", Toast.LENGTH_SHORT).show()
 

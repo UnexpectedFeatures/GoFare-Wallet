@@ -1,8 +1,10 @@
 package com.example.gofare
 
+import android.app.Activity.RESULT_OK
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
@@ -11,17 +13,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 
 class RegisterFragment : Fragment() {
 
+    lateinit var studentUpload : LinearLayout
     lateinit var toLogin : ImageButton
     lateinit var firstNameTxt : EditText
     lateinit var lastNameTxt : EditText
@@ -29,6 +37,9 @@ class RegisterFragment : Fragment() {
     lateinit var birthdayText : EditText
     lateinit var addressTxt : EditText
     lateinit var genderRadioGrp: RadioGroup
+    lateinit var studentRadioGrp: RadioGroup
+    lateinit var student: RadioButton
+    lateinit var nonStudent: RadioButton
     lateinit var emailTxt : EditText
     lateinit var contactTxt : EditText
     lateinit var passwordTxt : EditText
@@ -36,11 +47,15 @@ class RegisterFragment : Fragment() {
     lateinit var signUpBtn : com.google.android.material.button.MaterialButton
     private lateinit var togglePasswordBtn: ImageButton
     private lateinit var toggleConfirmPasswordBtn: ImageButton
+    private lateinit var imageView: ImageView
+    private lateinit var buttonChoose: Button
+
+    var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toLogin = view.findViewById(R.id.toLogin)
@@ -50,6 +65,7 @@ class RegisterFragment : Fragment() {
         birthdayText = view.findViewById(R.id.birthdayEditText)
         addressTxt = view.findViewById(R.id.addressEditText)
         genderRadioGrp = view.findViewById(R.id.genderRadioGrp)
+        studentRadioGrp = view.findViewById(R.id.studentRadioGroup)
         contactTxt = view.findViewById(R.id.contactEditText)
         emailTxt = view.findViewById(R.id.emailEditText)
         passwordTxt = view.findViewById(R.id.passwordEditText)
@@ -57,6 +73,12 @@ class RegisterFragment : Fragment() {
         signUpBtn = view.findViewById(R.id.signUpBtn)
         togglePasswordBtn = view.findViewById(R.id.togglePasswordBtn)
         toggleConfirmPasswordBtn = view.findViewById(R.id.toggleConfirmPasswordBtn)
+        student = view.findViewById(R.id.student)
+        nonStudent = view.findViewById(R.id.nonStudent)
+        studentUpload = view.findViewById(R.id.studentUpload)
+
+        imageView = view.findViewById(R.id.image_view)
+        buttonChoose = view.findViewById(R.id.button_choose_image)
 
         toLogin.setOnClickListener {
             val intent = Intent(
@@ -95,6 +117,10 @@ class RegisterFragment : Fragment() {
             confirmPasswordTxt.setSelection(confirmPasswordTxt.text.length)
         }
 
+        buttonChoose.setOnClickListener {
+            openFileChooser()
+        }
+
         birthdayText.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -110,6 +136,13 @@ class RegisterFragment : Fragment() {
                 year, month, day)
 
             datePickerDialog.show()
+        }
+
+        student.setOnClickListener{
+            studentUpload.visibility = View.VISIBLE
+        }
+        nonStudent.setOnClickListener{
+            studentUpload.visibility = View.GONE
         }
 
         signUpBtn.setOnClickListener(View.OnClickListener {
@@ -141,8 +174,8 @@ class RegisterFragment : Fragment() {
             val password = passwordTxt.text.toString().trim()
             val confirmPassword = confirmPasswordTxt.text.toString().trim()
 
-            if (contactNumber.length < 3 || contactNumber.length > 11 || contactNumber.toIntOrNull() == null){
-                Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
+            if (!contactNumber.matches(Regex("^\\d{10,11}$"))) {
+                Toast.makeText(requireContext(), "Invalid Contact Number. Only 10-11 digits allowed.", Toast.LENGTH_SHORT).show()
                 return@OnClickListener
             }
 
@@ -151,6 +184,19 @@ class RegisterFragment : Fragment() {
                 view.findViewById<RadioButton>(selectedGenderId).text.toString()
             } else {
                 ""
+            }
+
+            val studentChoice = studentRadioGrp.checkedRadioButtonId
+            val isStudent : Boolean
+            if (studentChoice != -1) {
+                if (studentChoice == 1){
+                    isStudent = true
+                }
+                else{
+                    isStudent = false
+                }
+            } else {
+                isStudent = false
             }
 
             val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,20}\$")
@@ -185,7 +231,7 @@ class RegisterFragment : Fragment() {
                         user?.sendEmailVerification()?.addOnCompleteListener { verifyTask ->
                             if (verifyTask.isSuccessful) {
                                 Toast.makeText(requireContext(), "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show()
-
+                                uploadImageToFirebase()
                                 val bundle = Bundle().apply {
                                     putString("firstName", firstName)
                                     putString("lastName", lastName)
@@ -197,6 +243,7 @@ class RegisterFragment : Fragment() {
                                     putString("contact", contactNumber)
                                     putString("email", email)
                                     putString("password", password)
+                                    putBoolean("studentStatus", isStudent)
                                 }
 
                                 val registerEmailFragment = RegisterEmailFragment()
@@ -208,6 +255,22 @@ class RegisterFragment : Fragment() {
 
                                 auth.signOut()
                             } else {
+                                val storage = FirebaseStorage.getInstance().reference.child("studentIds/${user.uid}")
+                                storage.listAll()
+                                    .addOnSuccessListener { listResult ->
+                                        listResult.items.forEach { fileRef ->
+                                            fileRef.delete()
+                                                .addOnSuccessListener {
+                                                    Log.d("Delete", "Deleted: ${fileRef.name}")
+                                                }
+                                                .addOnFailureListener { e ->
+                                                    Log.e("Delete", "Error deleting ${fileRef.name}", e)
+                                                }
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Delete", "Error listing user files", e)
+                                    }
                                 user.delete()
                                 Toast.makeText(requireContext(), "Failed to send verification email: ${verifyTask.exception?.message}", Toast.LENGTH_LONG).show()
                             }
@@ -219,7 +282,49 @@ class RegisterFragment : Fragment() {
         })
     }
 
+    val PICK_IMAGE_REQUEST = 1
 
+    fun openFileChooser() {
+        val intent = Intent()
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) {
+            imageUri = data.data
+        }
+        imageView.setImageURI(imageUri)
+    }
+
+    fun uploadImageToFirebase() {
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        if (user != null){
+
+        if (imageUri != null) {
+            val storageRef = FirebaseStorage.getInstance().reference
+            val fileRef = storageRef.child("studentIds/${user.uid}/${System.currentTimeMillis()}.jpg")
+
+            val uploadTask = fileRef.putFile(imageUri!!)
+                uploadTask.addOnSuccessListener {
+                    fileRef.downloadUrl.addOnSuccessListener { uri ->
+                        if (!isAdded) return@addOnSuccessListener
+                        val downloadUrl = uri.toString()
+                        context?.let {
+                            Toast.makeText(it, "Upload successful", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }.addOnFailureListener {
+                    Toast.makeText(requireContext(), "Upload failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(requireContext(), "No image selected", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

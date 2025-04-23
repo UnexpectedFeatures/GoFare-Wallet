@@ -17,6 +17,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import org.mindrot.jbcrypt.BCrypt;
 
 class MPinRegisterFragment : Fragment() {
@@ -38,6 +39,22 @@ class MPinRegisterFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             val user = auth.currentUser
             if (user != null){
+                val storage = FirebaseStorage.getInstance().reference.child("studentIds/${user.uid}")
+                storage.listAll()
+                    .addOnSuccessListener { listResult ->
+                        listResult.items.forEach { fileRef ->
+                            fileRef.delete()
+                                .addOnSuccessListener {
+                                    Log.d("Delete", "Deleted: ${fileRef.name}")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Delete", "Error deleting ${fileRef.name}", e)
+                                }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Delete", "Error listing user files", e)
+                    }
                 user.delete()
                 Toast.makeText(requireContext(), "Registration Aborted", Toast.LENGTH_SHORT).show()
 
@@ -70,6 +87,22 @@ class MPinRegisterFragment : Fragment() {
 
         binding.cancelButton.setOnClickListener {
             val user = auth.currentUser
+            val storage = FirebaseStorage.getInstance().reference.child("studentIds/${user?.uid}")
+            storage.listAll()
+                .addOnSuccessListener { listResult ->
+                    listResult.items.forEach { fileRef ->
+                        fileRef.delete()
+                            .addOnSuccessListener {
+                                Log.d("Delete", "Deleted: ${fileRef.name}")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Delete", "Error deleting ${fileRef.name}", e)
+                            }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e("Delete", "Error listing user files", e)
+                }
             user?.delete()
                 ?.addOnSuccessListener {
                     Toast.makeText(requireContext(), "Registration Cancelled", Toast.LENGTH_SHORT).show()
@@ -144,21 +177,22 @@ class MPinRegisterFragment : Fragment() {
             val contact = arguments?.getString("contact") ?: ""
             val email = arguments?.getString("email") ?: ""
             val password = arguments?.getString("password") ?: ""
+            val studentStatus = arguments?.getBoolean("studentStatus") ?: false
 
-            saveUserToDatabase(userId, firstName, lastName, middleName, birthday, age, address, gender, contact, email, password, mpin)
+            saveUserToDatabase(userId, firstName, lastName, middleName, birthday, age, address, gender, contact, email, password, mpin, studentStatus)
 
             Toast.makeText(requireContext(), "Successful Registration", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(
                 requireContext(),
-                HomeActivity::class.java
+                MainActivity::class.java
             )
 
             startActivity(intent)
         }
     }
 
-    private fun saveUserToDatabase(userId: String, firstName: String, lastName: String, middleName: String, birthday: String, age: Int, address: String, gender: String, contactNo: String, email: String, password: String, pin: String) {
+    private fun saveUserToDatabase(userId: String, firstName: String, lastName: String, middleName: String, birthday: String, age: Int, address: String, gender: String, contactNo: String, email: String, password: String, pin: String, studentStatus: Boolean) {
         val db = FirebaseFirestore.getInstance()
         val userRef = db.collection("Users").document(userId)
         val pinRef = db.collection("UserPin").document(userId)
@@ -180,6 +214,7 @@ class MPinRegisterFragment : Fragment() {
             "gender" to gender,
             "contactNumber" to contactNo,
             "email" to email,
+            "studentStatus" to studentStatus,
             "creationDate" to Timestamp.now(),
             "updateDate" to Timestamp.now(),
             "enabled" to true
@@ -196,6 +231,9 @@ class MPinRegisterFragment : Fragment() {
             "registeredAt" to "",
             "renewedAt" to "",
             "rfid" to "",
+            "rfidActive" to false,
+            "nfc" to "",
+            "nfcActive" to false,
         )
 
         val mpinData = mapOf(

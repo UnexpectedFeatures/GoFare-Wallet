@@ -58,6 +58,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore:24.9.0")
     implementation ("com.stripe:stripe-android:20.9.0")
     implementation ("org.mindrot:jbcrypt:0.4")
+    implementation ("com.google.firebase:firebase-storage-ktx")
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.database)

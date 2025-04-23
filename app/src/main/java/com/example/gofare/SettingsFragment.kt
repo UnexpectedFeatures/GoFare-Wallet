@@ -57,6 +57,8 @@ class SettingsFragment : Fragment() {
         stEmail = view.findViewById(R.id.stEmail)
         userVerified = view.findViewById(R.id.userVerified)
         contactButton = view.findViewById(R.id.contactButton)
+        privacyButton = view.findViewById(R.id.privacyButton)
+        aboutButton = view.findViewById(R.id.aboutButton)
 
         val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
         viewModel.startLive()
@@ -78,6 +80,14 @@ class SettingsFragment : Fragment() {
 
         contactButton.setOnClickListener {
             switchFragment(ContactFragment())
+        }
+
+        privacyButton.setOnClickListener {
+            switchFragment(PolicyFragment())
+        }
+
+        aboutButton.setOnClickListener {
+            switchFragment(AboutFragment())
         }
 
         topUpHistoryButton.setOnClickListener {

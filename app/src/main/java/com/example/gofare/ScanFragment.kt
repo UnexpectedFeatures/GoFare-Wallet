@@ -126,7 +126,7 @@ class ScanFragment : Fragment() {
 
         // Check if this fragment was triggered by a tag scan
         if (requireActivity().intent?.action == NfcAdapter.ACTION_TAG_DISCOVERED) {
-            handleNfcIntent(requireActivity().intent)
+//            handleNfcIntent(requireActivity().intent)
             // Clear the intent to avoid multiple triggers
             requireActivity().intent = Intent()
         }
@@ -163,45 +163,44 @@ class ScanFragment : Fragment() {
         }
     }
 
-    private fun handleNfcIntent(intent: Intent) {
-        val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-        }
-
-        if (tag != null) {
-            val tagId = tag.id.joinToString("") { "%02X".format(it) }
-            val userId = auth.currentUser?.uid ?: return
-            val dynamicNfcRef = FirebaseFirestore.getInstance()
-                .collection("UserDynamicNFC")
-                .document(userId)
-
-            dynamicNfcRef.get().addOnSuccessListener { document ->
-                val previousId = document.getString("nfcId") ?: ""
-
-                val nfcUpdate = mapOf(
-                    "nfcId" to tagId,
-                    "previousId" to previousId,
-                    "updatedAt" to Timestamp.now()
-                )
-
-                dynamicNfcRef.set(nfcUpdate).addOnSuccessListener {
-                    Toast.makeText(requireContext(), "NFC scanned: $tagId", Toast.LENGTH_SHORT).show()
-                    Toast.makeText(requireContext(), "Proceeding to payment: $tagId", Toast.LENGTH_SHORT).show()
-                    requireActivity().supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .commit()
-                }.addOnFailureListener {
-                    Toast.makeText(requireContext(), "Failed to update NFC", Toast.LENGTH_SHORT).show()
-                }
-            }.addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to read Firestore", Toast.LENGTH_SHORT).show()
-            }
-        } else {
-            Toast.makeText(requireContext(), "No NFC tag detected", Toast.LENGTH_SHORT).show()
-        }
-    }
+//    private fun handleNfcIntent(intent: Intent) {
+//        val tag: Tag? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
+//        } else {
+//            intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+//        }
+//
+//        if (tag != null) {
+//            val tagId = tag.id.joinToString("") { "%02X".format(it) }
+//            val userId = auth.currentUser?.uid ?: return
+//            val dynamicNfcRef = FirebaseFirestore.getInstance()
+//                .collection("UserDynamicNFC")
+//                .document(userId)
+//
+//            dynamicNfcRef.get().addOnSuccessListener { document ->
+//                val previousId = document.getString("nfcId") ?: ""
+//
+//                val nfcUpdate = mapOf(
+//                    "nfcId" to tagId,
+//                    "previousId" to previousId,
+//                    "updatedAt" to Timestamp.now()
+//                )
+//
+//                dynamicNfcRef.set(nfcUpdate).addOnSuccessListener {
+//                    Toast.makeText(requireContext(), "NFC scanned: $tagId", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(requireContext(), "Proceeding to payment: $tagId", Toast.LENGTH_SHORT).show()
+//                    requireActivity().supportFragmentManager.beginTransaction()
+//                        .replace(R.id.fragment_container, HomeFragment())
+//                        .commit()
+//                }.addOnFailureListener {
+//                    Toast.makeText(requireContext(), "Failed to update NFC", Toast.LENGTH_SHORT).show()
+//                }
+//            }.addOnFailureListener {
+//                Toast.makeText(requireContext(), "Failed to read Firestore", Toast.LENGTH_SHORT).show()
+//            }
+//        } else {
+//            Toast.makeText(requireContext(), "No NFC tag detected", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
 }

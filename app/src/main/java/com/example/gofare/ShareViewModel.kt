@@ -37,6 +37,9 @@ class SharedViewModel : ViewModel() {
     }
 
     // User Data
+    private val _studentStatus = MutableLiveData<Boolean>()
+    val studentStatus: LiveData<Boolean> get() = _studentStatus
+
     private val _fullName = MutableLiveData<String>()
     val fullName: LiveData<String> get() = _fullName
 
@@ -267,6 +270,7 @@ class SharedViewModel : ViewModel() {
                     _contactNumber.value = document.getString("contactNumber") ?: ""
                     _email.value = document.getString("email") ?: ""
                     _gender.value = document.getString("gender") ?: ""
+                    _studentStatus.value = document.getBoolean("studentStatus") ?: false
 
                     Log.d("FirebaseData", "User data updated successfully")
                 } else {

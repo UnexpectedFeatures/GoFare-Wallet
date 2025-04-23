@@ -34,6 +34,7 @@ class ProfileFragment : Fragment() {
     private lateinit var pfMiddleName : EditText
     private lateinit var pfLastName : EditText
     private lateinit var emailLabel : TextView
+    private lateinit var isStudent : TextView
     private lateinit var pfEmail : EditText
     private lateinit var pfContactNumber : EditText
     private lateinit var pfAddress : EditText
@@ -42,6 +43,9 @@ class ProfileFragment : Fragment() {
     private lateinit var radioMale : RadioButton
     private lateinit var radioFemale : RadioButton
     private lateinit var pfGenderRadioGrp : RadioGroup
+    private lateinit var student : RadioButton
+    private lateinit var nonStudent : RadioButton
+    private lateinit var studentRadioGroup : RadioGroup
 
     private lateinit var editBtn : com.google.android.material.button.MaterialButton
 
@@ -70,6 +74,7 @@ class ProfileFragment : Fragment() {
         pfMiddleName = view.findViewById(R.id.pfMiddleName)
         pfLastName = view.findViewById(R.id.pfLastName)
         pfEmail = view.findViewById(R.id.pfEmail)
+        isStudent = view.findViewById(R.id.isStudent)
         emailLabel = view.findViewById(R.id.emailLabel)
         pfContactNumber = view.findViewById(R.id.pfContactNumber)
         pfAddress = view.findViewById(R.id.pfAddress)
@@ -79,6 +84,9 @@ class ProfileFragment : Fragment() {
         pfGenderRadioGrp = view.findViewById(R.id.pfGenderRadioGrp)
         radioMale = view.findViewById(R.id.maleRadio)
         radioFemale = view.findViewById(R.id.femaleRadio)
+        studentRadioGroup = view.findViewById(R.id.studentRadioGroup)
+        student = view.findViewById(R.id.student)
+        nonStudent = view.findViewById(R.id.nonStudent)
         saveBtn = view.findViewById(R.id.confirmButton)
         editBtn = view.findViewById(R.id.editButton)
         cancelBtn = view.findViewById(R.id.cancelButton)
@@ -93,6 +101,8 @@ class ProfileFragment : Fragment() {
             editLayout.visibility = View.VISIBLE
             pfEmail.visibility = View.GONE
             emailLabel.visibility = View.GONE
+            studentRadioGroup.visibility = View.GONE
+            isStudent.visibility = View.GONE
         }
 
         saveBtn.setOnClickListener{
@@ -105,6 +115,8 @@ class ProfileFragment : Fragment() {
             editLayout.visibility = View.GONE
             pfEmail.visibility = View.VISIBLE
             emailLabel.visibility = View.VISIBLE
+            studentRadioGroup.visibility = View.VISIBLE
+            isStudent.visibility = View.VISIBLE
         }
 
         cancelBtn.setOnClickListener{
@@ -114,6 +126,8 @@ class ProfileFragment : Fragment() {
             editLayout.visibility = View.GONE
             pfEmail.visibility = View.VISIBLE
             emailLabel.visibility = View.VISIBLE
+            studentRadioGroup.visibility = View.VISIBLE
+            isStudent.visibility = View.VISIBLE
             displayUserData()
         }
 
@@ -168,7 +182,6 @@ class ProfileFragment : Fragment() {
                 val lastName = pfLastName.text.toString().trim()
                 val middleName = pfMiddleName.text.toString().trim()
                 val birthday = pfBirthday.text.toString().trim()
-
                 val currentYear = Calendar.getInstance().get(Calendar.YEAR)
                 val birthYear = birthday.substring(birthday.length - 4).toInt()
 
@@ -191,8 +204,9 @@ class ProfileFragment : Fragment() {
                     Toast.makeText(requireContext(), "Age must be between 7 and 120!", Toast.LENGTH_SHORT).show()
                     return
                 }
-                if (contactNumber.length < 3 || contactNumber.length > 11 || contactNumber.toIntOrNull() == null){
-                    Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
+
+                if (!contactNumber.matches(Regex("^\\d{10,11}$"))) {
+                    Toast.makeText(requireContext(), "Invalid Contact Number. Only 10-11 digits allowed.", Toast.LENGTH_SHORT).show()
                     return
                 }
 
@@ -259,6 +273,14 @@ class ProfileFragment : Fragment() {
         }
         viewModel.age.observe(viewLifecycleOwner) { name ->
             pfAge.setText(name)
+        }
+        viewModel.studentStatus.observe(viewLifecycleOwner) { name ->
+            if (name == true){
+                student.isChecked = true
+            }
+            else {
+                nonStudent.isChecked = true
+            }
         }
         viewModel.gender.observe(viewLifecycleOwner) { gender ->
             if (gender.trim() == "Male" || gender.trim() == "male"){

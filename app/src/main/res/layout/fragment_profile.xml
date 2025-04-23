@@ -318,6 +318,49 @@
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/isStudent"
+                        android:layout_width="match_parent"
+                        android:layout_height="24dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:text="Student:"
+                        android:textColor="@color/black"
+                        android:textSize="16dp" />
+
+                    <LinearLayout
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioGroup
+                            android:id="@+id/studentRadioGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:orientation="horizontal">
+
+                            <RadioButton
+                                android:id="@+id/student"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:buttonTint="@color/black"
+                                android:text="Yes"
+                                android:textColor="@color/black"
+                                android:enabled="false"/>
+
+                            <RadioButton
+                                android:id="@+id/nonStudent"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:buttonTint="@color/black"
+                                android:text="No"
+                                android:textColor="@color/black"
+                                android:enabled="false"/>
+
+                        </RadioGroup>
+
+                    </LinearLayout>
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/editMode"
                         android:visibility="gone"

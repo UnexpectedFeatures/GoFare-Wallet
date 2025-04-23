@@ -289,9 +289,85 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/isStudent"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:text="Are You a Student?"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="156dp"
+            android:layout_height="wrap_content">
+
+                <RadioGroup
+                    android:id="@+id/studentRadioGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/student"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:buttonTint="@color/black"
+                            android:text="Yes"
+                            android:textColor="@color/black" />
+
+                        <RadioButton
+                            android:id="@+id/nonStudent"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:buttonTint="@color/black"
+                            android:text="No"
+                            android:textColor="@color/black" />
+
+                </RadioGroup>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/studentUpload"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/pearl_white"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center">
+                <TextView
+                    android:id="@+id/studentPrompt"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:text="For Students, Insert your School ID:"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
+                <!-- ImageView to preview the selected image -->
+                <ImageView
+                    android:id="@+id/image_view"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_marginBottom="16dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_student_id" />
+
+                <!-- Button to choose image -->
+                <Button
+                    android:id="@+id/button_choose_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/powder_blue"
+                    android:textColor="@color/black"
+                    android:text="Choose Image" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
             android:gravity="center"
             android:orientation="vertical">
 
