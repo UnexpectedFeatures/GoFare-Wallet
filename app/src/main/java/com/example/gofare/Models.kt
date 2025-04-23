@@ -40,7 +40,7 @@ data class Transaction(
     val remainingBalance: Double = 0.0,
     val totalAmount: Double = 0.0,
     val transactionId: String? = null,
-    val refunded: Boolean? = false,
+    val refunded: Boolean? = false
 ): Parcelable
 
 @Parcelize

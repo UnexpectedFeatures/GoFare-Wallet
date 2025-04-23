@@ -7,16 +7,6 @@
     android:background="@drawable/bg_main"
     tools:context=".ReceiptFragment">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="176dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <include layout="@layout/header_default" />
-    </LinearLayout>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
@@ -25,18 +15,18 @@
         android:background="@drawable/pale_aqua_radius_a"
         android:gravity="start"
         android:orientation="vertical"
-        android:paddingBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/transactionId"
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:background="@drawable/powder_bliue_top_radius_a"
             android:gravity="center"
             android:text="Transaction ID"
-            android:background="@drawable/powder_bliue_top_radius_a"
             android:textColor="@color/black"
             android:textSize="40sp"
             app:layout_constraintTop_toTopOf="parent" />
@@ -125,10 +115,10 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:background="@color/powder_blue"
             android:gravity="center"
             android:text="Loaned: True"
             android:textColor="@color/black"
-            android:background="@color/powder_blue"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -141,10 +131,10 @@
             android:layout_weight="1"
             android:background="@color/muted_crimson"
             android:gravity="center"
-            android:visibility="gone"
             android:text="REFUNDED"
             android:textColor="@color/white"
             android:textSize="24sp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -155,9 +145,9 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:background="@color/pearl_white"
             android:gravity="center"
             android:text="Date: 01/24/2025"
-            android:background="@color/pearl_white"
             android:textColor="@color/black"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -168,8 +158,8 @@
             android:id="@+id/linearLayout11"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:background="@color/pearl_white"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout10">
@@ -225,7 +215,7 @@
                     android:layout_weight="1"
                     android:gravity="start"
                     android:paddingHorizontal="16dp"
-                    android:text="Total"
+                    android:text="Total Fare:"
                     android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold"
@@ -250,16 +240,95 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearLayout15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/seashell_white"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout11">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingVertical="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:paddingHorizontal="16dp"
+                    android:text="Discount:"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/transactionId" />
+
+                <TextView
+                    android:id="@+id/discount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:paddingHorizontal="16dp"
+                    android:text="False"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/transactionId" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingVertical="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:paddingHorizontal="16dp"
+                    android:text="Amount:"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/transactionId" />
+
+                <TextView
+                    android:id="@+id/discountType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:paddingHorizontal="16dp"
+                    android:text="Student"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/transactionId" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/remainingBalLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@color/seashell_white"
             android:orientation="vertical"
             android:paddingVertical="16dp"
-            android:background="@color/seashell_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout11">
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout15">
 
             <TextView
                 android:id="@+id/remBalTV"

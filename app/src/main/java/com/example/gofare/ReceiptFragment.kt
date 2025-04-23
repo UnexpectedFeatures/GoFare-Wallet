@@ -18,12 +18,15 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import org.w3c.dom.Text
+import java.lang.Math.ceil
 
 class ReceiptFragment : Fragment() {
 
     private lateinit var transactionId : TextView
     private lateinit var pickup : TextView
     private lateinit var dropoff : TextView
+    private lateinit var discount : TextView
+    private lateinit var discountType : TextView
     private lateinit var loaned : TextView
     private lateinit var dateTime : TextView
     private lateinit var balance : TextView
@@ -32,6 +35,7 @@ class ReceiptFragment : Fragment() {
     private lateinit var remBalTV : TextView
     private lateinit var refundBtn : com.google.android.material.button.MaterialButton
     private lateinit var refundedTv : TextView
+    private lateinit var discountLayout : LinearLayout
 
     companion object {
         fun newInstance(transaction: Transaction): ReceiptFragment {
@@ -64,6 +68,9 @@ class ReceiptFragment : Fragment() {
         remainingBalance = view.findViewById(R.id.remainingBalance)
         remBalTV = view.findViewById(R.id.remBalTV)
         refundedTv = view.findViewById(R.id.refunded)
+        discount = view.findViewById(R.id.discount)
+        discountType = view.findViewById(R.id.discountType)
+        discountLayout = view.findViewById(R.id.linearLayout15)
 
         val transaction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("selectedTransaction", Transaction::class.java)
@@ -91,11 +98,16 @@ class ReceiptFragment : Fragment() {
             loaned.visibility = View.VISIBLE
         }
 
+        if (transaction?.discount == false){
+            discountLayout.visibility = View.GONE
+        }
 
         if (transaction?.refunded == true){
             refundedTv.visibility = View.VISIBLE
             refundBtn.visibility = View.GONE
         }
+
+        val discountAmount = transaction?.totalAmount?.times(0.10)
 
         viewModel.currency.observe(viewLifecycleOwner) { currency ->
             transactionId.text = transaction?.transactionId
@@ -105,6 +117,8 @@ class ReceiptFragment : Fragment() {
             dateTime.text = "Date: " + transaction?.dateTime
             balance.text = "$currency " + transaction?.currentBalance.toString()
             total.text = "$currency " + transaction?.totalAmount.toString()
+            discount.text = "${transaction?.discount.toString()}"
+            discountType.text = currency + " " + discountAmount?.let { ceil(it) }
             if (transaction?.loaned == false){
                 remainingBalance.text = "$currency " + transaction?.remainingBalance.toString()
             }
