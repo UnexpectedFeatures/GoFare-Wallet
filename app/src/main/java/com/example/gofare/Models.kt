@@ -37,6 +37,7 @@ data class Transaction(
     val remainingBalance: Double = 0.0,
     val totalAmount: Double = 0.0,
     val transactionId: String? = null,
+    val refunded: Boolean? = false,
 ): Parcelable
 
 @Parcelize
@@ -58,4 +59,20 @@ data class TopUpHistory(
     val topUpAmount: Double = 0.0,
     val tax: Double = 0.0
 ): Parcelable
+
+@Parcelize
+data class Transit(
+    val completedAt: String? = null,
+    val createdAt: String? = null,
+    val dropoffStop: String? = null,
+    val dropoffTime: String? = null,
+    val pickupStop: String? = null,
+    val pickupTime: String? = null,
+    val status: String? = null,
+    val updatedAt: String? = null,
+    val userId: String? = null,
+    val userName: String? = null,
+    val vehicle: String? = null
+): Parcelable
+
 

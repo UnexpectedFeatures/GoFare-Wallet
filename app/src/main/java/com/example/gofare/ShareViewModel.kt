@@ -22,6 +22,7 @@ class SharedViewModel : ViewModel() {
     private val transactionRef = FirebaseFirestore.getInstance().collection("UserTransaction")
     private val requestsRef = FirebaseFirestore.getInstance().collection("UserRequests")
     private val topUpRef = FirebaseFirestore.getInstance().collection("UserTopUp")
+    private val transitRef = FirebaseFirestore.getInstance().collection("UserAssignments")
 
     private var usersListener: ValueEventListener? = null
     private var transactionListener: ValueEventListener? = null
@@ -87,9 +88,13 @@ class SharedViewModel : ViewModel() {
     private val _requests = MutableLiveData<List<UserRequest>>()
     val requests: LiveData<List<UserRequest>> get() = _requests
 
-    // User Requests
+    // User TopUp
     private val _topUp = MutableLiveData<List<TopUpHistory>>()
     val topUp: LiveData<List<TopUpHistory>> get() = _topUp
+
+    // User Transit
+    private val _transit = MutableLiveData<String>()
+    val transit: LiveData<String> get() = _transit
 
     // Current User RFID
     private val _rfid = MutableLiveData<String>()
@@ -116,8 +121,43 @@ class SharedViewModel : ViewModel() {
             observeUserTransactions()
             obeserveUserWallet()
             observeTopUpHistory()
+            observeTransit()
         }
     }
+
+    fun observeTransit() {
+        if (userId != null) {
+            transitRef.whereEqualTo("userId", userId)
+                .addSnapshotListener { querySnapshot, error ->
+                    if (error != null) {
+                        Log.e("FirebaseData", "Error listening to transit status", error)
+                        return@addSnapshotListener
+                    }
+
+                    if (querySnapshot != null && !querySnapshot.isEmpty) {
+                        val matchingDoc = querySnapshot.documents.find {
+                            it.getString("status") == "awaiting_dropoff"
+                        }
+
+                        if (matchingDoc != null) {
+                            val status = matchingDoc.getString("status") ?: ""
+                            _transit.value = status
+                            Log.d("TransitStatus", "Transit status updated: $status")
+                        } else {
+                            _transit.value = ""
+                            Log.d("TransitStatus", "No awaiting_dropoff status found")
+                        }
+                    } else {
+                        _transit.value = "" // or "none"
+                        Log.d("TransitStatus", "No matching documents found")
+                    }
+                }
+        } else {
+            Log.d("TransitStatus", "UserId is null")
+        }
+    }
+
+
 
     fun observeTopUpHistory(){
         if (userId != null){
@@ -272,7 +312,8 @@ class SharedViewModel : ViewModel() {
                             discount = data["discount"] as? Boolean ?: false,
                             loaned = data["loaned"] as? Boolean ?: false,
                             loanedAmount = (data["loanedAmount"] as? Number)?.toDouble() ?: 0.0,
-                            dateTime = data["dateTime"] as? String ?: ""
+                            dateTime = data["dateTime"] as? String ?: "",
+                            refunded = data["refunded"] as? Boolean ?: false
                         )
                         allTransactions.add(transaction)
                     }

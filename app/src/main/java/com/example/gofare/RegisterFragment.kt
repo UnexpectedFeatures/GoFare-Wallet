@@ -6,6 +6,7 @@ import android.icu.util.Calendar
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -140,11 +141,9 @@ class RegisterFragment : Fragment() {
             val password = passwordTxt.text.toString().trim()
             val confirmPassword = confirmPasswordTxt.text.toString().trim()
 
-            if (contactNumber.length < 3 || contactNumber.length > 11){
+            if (contactNumber.length < 3 || contactNumber.length > 11 || contactNumber.toIntOrNull() == null){
                 Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
-            }
-            if (contactNumber){
-                Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
+                return@OnClickListener
             }
 
             val selectedGenderId = genderRadioGrp.checkedRadioButtonId
@@ -154,8 +153,11 @@ class RegisterFragment : Fragment() {
                 ""
             }
 
-            val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,20}\$")
-
+            val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,20}\$")
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(requireContext(), "Enter a Valid Email!", Toast.LENGTH_SHORT).show()
+                return@OnClickListener
+            }
             if (!password.matches(passwordRegex)) {
                 Toast.makeText(requireContext(), "Password must be 8–20 characters long and include uppercase, lowercase, digit, and special character.", Toast.LENGTH_SHORT).show()
                 return@OnClickListener

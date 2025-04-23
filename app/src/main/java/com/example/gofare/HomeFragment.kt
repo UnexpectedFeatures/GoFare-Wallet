@@ -12,7 +12,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.type.DateTime
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -27,6 +31,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var dropoff: TextView
     private lateinit var total: TextView
     private lateinit var dateTime: TextView
+    private lateinit var transitTv: TextView
+
+    private lateinit var viewModel: SharedViewModel
+    private var transitAnimationJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +45,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             Toast.makeText(requireContext(), "Please Log Out in the settings", Toast.LENGTH_SHORT).show()
@@ -53,6 +63,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         total = view.findViewById(R.id.total)
         dateTime = view.findViewById(R.id.dateTime)
 
+        transitTv = view.findViewById(R.id.transitTv)
+
         topUpBtn.setOnClickListener{
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, TopUpFragment())
@@ -64,18 +76,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 .commit()
         }
 
-
-
         displayUserData()
         displayOverview()
     }
 
     private fun displayOverview() {
-        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-
         viewModel.startLive()
 
         viewModel.transactions.observe(viewLifecycleOwner) { transactionsList ->
+            Log.d("Transaction Display", "Displaying Transactions")
             if (transactionsList.isNotEmpty()) {
                 val lastTransaction = transactionsList[transactionsList.size - 1]
                 pickup.text = "Pickup: ${lastTransaction.pickup ?: "Unknown"}"
@@ -89,6 +98,34 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 dateTime.text = "Date: -"
             }
         }
+
+
+        viewModel.transit.observe(viewLifecycleOwner) { transit ->
+            var isActive = false
+            if (transit.isNotEmpty()){
+                isActive = true
+                val texts = listOf("In Transit   ", "In Transit.  ", "In Transit.. ", "In Transit...")
+
+                transitAnimationJob = lifecycleScope.launch {
+                    while (isActive) {
+                        for (text in texts) {
+                            transitTv.text = text
+                            delay(500)
+                        }
+                    }
+                }
+                transitTv.visibility = View.VISIBLE
+            }
+            else{
+                isActive = false
+                stopTransitTextLoop()
+                transitTv.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun stopTransitTextLoop() {
+        transitAnimationJob?.cancel()
     }
 
     private fun displayUserData() {
@@ -114,8 +151,4 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             tvCurrency.text = currency ?: "PHP"
         }
     }
-
-
-
-
 }

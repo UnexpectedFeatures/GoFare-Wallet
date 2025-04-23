@@ -135,6 +135,22 @@
             app:layout_constraintTop_toBottomOf="@+id/dateTime" />
 
         <TextView
+            android:id="@+id/refunded"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="@color/muted_crimson"
+            android:gravity="center"
+            android:visibility="gone"
+            android:text="REFUNDED"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loaned" />
+
+        <TextView
             android:id="@+id/dateTime"
             android:layout_width="0dp"
             android:layout_height="48dp"
@@ -289,7 +305,7 @@
             app:cornerRadius="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loaned" />
+            app:layout_constraintTop_toBottomOf="@+id/refunded" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

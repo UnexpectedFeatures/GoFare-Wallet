@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
+import java.util.Date
 
 class ProfileFragment : Fragment() {
 
@@ -174,6 +175,19 @@ class ProfileFragment : Fragment() {
                     0 -> "Male"
                     1 -> "Female"
                     else -> ""
+                }
+
+                if (birthYear > Calendar.getInstance().get(Calendar.YEAR)){
+                    Toast.makeText(requireContext(), "Invalid Birthday! Please enter a valid year of birth", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                if (age < 7 || age > 120) {
+                    Toast.makeText(requireContext(), "Age must be between 7 and 120!", Toast.LENGTH_SHORT).show()
+                    return
+                }
+                if (contactNumber.length < 3 || contactNumber.length > 11 || contactNumber.toIntOrNull() == null){
+                    Toast.makeText(requireContext(), "Invalid Contact Number, Must be 3 to 15 Length", Toast.LENGTH_SHORT).show()
+                    return
                 }
 
                 val userData = mapOf(

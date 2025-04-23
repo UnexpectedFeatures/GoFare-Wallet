@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import org.w3c.dom.Text
 
 class ReceiptFragment : Fragment() {
 
@@ -30,6 +31,7 @@ class ReceiptFragment : Fragment() {
     private lateinit var remainingBalance : TextView
     private lateinit var remBalTV : TextView
     private lateinit var refundBtn : com.google.android.material.button.MaterialButton
+    private lateinit var refundedTv : TextView
 
     companion object {
         fun newInstance(transaction: Transaction): ReceiptFragment {
@@ -61,6 +63,7 @@ class ReceiptFragment : Fragment() {
         total = view.findViewById(R.id.total)
         remainingBalance = view.findViewById(R.id.remainingBalance)
         remBalTV = view.findViewById(R.id.remBalTV)
+        refundedTv = view.findViewById(R.id.refunded)
 
         val transaction = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable("selectedTransaction", Transaction::class.java)
@@ -86,8 +89,14 @@ class ReceiptFragment : Fragment() {
         else {
             remBalTV.setText("Loaned Amount:")
             loaned.visibility = View.VISIBLE
-
         }
+
+
+        if (transaction?.refunded == true){
+            refundedTv.visibility = View.VISIBLE
+            refundBtn.visibility = View.GONE
+        }
+
         viewModel.currency.observe(viewLifecycleOwner) { currency ->
             transactionId.text = transaction?.transactionId
             pickup.text = transaction?.pickup
