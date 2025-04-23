@@ -134,6 +134,12 @@ class ProfileFragment : Fragment() {
             datePickerDialog.show()
         }
 
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
+                .commit()
+        }
+
         displayUserData()
     }
 

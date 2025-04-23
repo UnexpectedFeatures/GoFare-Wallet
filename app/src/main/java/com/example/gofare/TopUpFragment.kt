@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.lifecycle.ViewModelProvider
 import com.example.gofare.databinding.FragmentTopUpBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -73,6 +74,12 @@ class TopUpFragment : Fragment() {
             requireContext(),
             "pk_test_51RFWOBBLDZkRasaW9U1JVUm4b00HYbwwGuOWi2RZy9g4C58BshODQfbuX6akLQRA967OMqzwIDzAbtwwfYCbh5u800D1xCS6Db"
         )
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
+                .commit()
+        }
 
         // Then initialize your PaymentSheet
         paymentSheet = PaymentSheet(this) { paymentResult ->

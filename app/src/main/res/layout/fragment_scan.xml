@@ -27,10 +27,23 @@
 
 
         <TextView
+            android:id="@+id/scanningTv"
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:gravity="center"
-            android:text="Proceeding with Scan to Pay"
+            android:text="Scanning To Pay..."
+            android:textAlignment="center"
+            android:background="@color/powder_blue"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/scanningSuccess"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:visibility="gone"
+            android:gravity="center"
+            android:text="Payment Successful!"
             android:textAlignment="center"
             android:background="@color/powder_blue"
             android:textColor="@color/black"

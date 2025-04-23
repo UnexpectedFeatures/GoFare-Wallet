@@ -3,29 +3,64 @@ package com.example.gofare
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.example.gofare.databinding.FragmentScanBinding
+import com.example.gofare.databinding.FragmentTopUpBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class ScanFragment : Fragment() {
 
     private var nfcAdapter: NfcAdapter? = null
     private lateinit var auth: FirebaseAuth
 
+    private var transitAnimationJob: Job? = null
+    private  lateinit var binding : FragmentScanBinding
+    private var allowScan = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         nfcAdapter = NfcAdapter.getDefaultAdapter(requireContext())
         auth = FirebaseAuth.getInstance()
+
+        val user = auth.currentUser
+        if (user != null) {
+            val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID").document(user.uid)
+            rfidRef.update("nfcActive", true)
+                .addOnSuccessListener {
+                    allowScan = true
+                    Toast.makeText(requireContext(), "NFC Scanning!", Toast.LENGTH_SHORT).show()
+                    Log.d("Firestore", "nfcActive set to true successfully")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "Error updating nfcActive", e)
+                }
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentScanBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -36,6 +71,43 @@ class ScanFragment : Fragment() {
                 .replace(R.id.fragment_container, HomeFragment())
                 .commit()
         }
+
+        val viewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
+        viewModel.startLive()
+        viewModel.nfcActive.observe(viewLifecycleOwner) { nfc ->
+            var isActive = false
+            if (nfc == false){
+                stopScanningTextLoop()
+                isActive = false
+                if (allowScan){
+                lifecycleScope.launch {
+                    binding.scanningTv.visibility = View.GONE
+                    binding.scanningSuccess.visibility = View.VISIBLE
+                    delay(1000)
+                    Toast.makeText(requireContext(), "Scan To Pay Successful!", Toast.LENGTH_SHORT).show()
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .commit()
+                }
+                }
+            }
+            else{
+                isActive = true
+                val texts = listOf("Scanning   ", "Scanning.  ", "Scanning.. ", "Scanning...")
+                transitAnimationJob = lifecycleScope.launch {
+                    while (isActive) {
+                        for (text in texts) {
+                            binding.scanningTv.text = text
+                            delay(500)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun stopScanningTextLoop() {
+        transitAnimationJob?.cancel()
     }
 
     override fun onResume() {
@@ -63,6 +135,32 @@ class ScanFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         nfcAdapter?.disableForegroundDispatch(requireActivity())
+        val user = auth.currentUser
+        if (user != null) {
+            val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID").document(user.uid)
+            rfidRef.update("nfcActive", false)
+                .addOnSuccessListener {
+                    Log.d("Firestore", "nfcActive set to false successfully in onPause")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "Error updating nfcActive in onPause", e)
+                }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        val user = auth.currentUser
+        if (user != null) {
+            val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID").document(user.uid)
+            rfidRef.update("nfcActive", false)
+                .addOnSuccessListener {
+                    Log.d("Firestore", "nfcActive set to false successfully in onPause")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "Error updating nfcActive in onPause", e)
+                }
+        }
     }
 
     private fun handleNfcIntent(intent: Intent) {
@@ -106,10 +204,4 @@ class ScanFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_scan, container, false)
-    }
 }

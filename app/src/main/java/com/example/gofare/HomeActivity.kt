@@ -16,8 +16,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import android.Manifest
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : AppCompatActivity() {
 
@@ -38,6 +40,18 @@ class HomeActivity : AppCompatActivity() {
 
         val auth = FirebaseAuth.getInstance()
         val currentUserId = auth.currentUser?.uid
+
+        val user = auth.currentUser
+        if (user != null) {
+            val rfidRef = FirebaseFirestore.getInstance().collection("UserRFID").document(user.uid)
+            rfidRef.update("nfcActive", false)
+                .addOnSuccessListener {
+                    Log.d("Firestore", "nfcActive set to false successfully in onPause")
+                }
+                .addOnFailureListener { e ->
+                    Log.w("Firestore", "Error updating nfcActive in onPause", e)
+                }
+        }
 
         if (currentUserId != null) {
             viewModel.startLive()

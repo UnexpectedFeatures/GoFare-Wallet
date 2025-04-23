@@ -100,8 +100,29 @@ class SharedViewModel : ViewModel() {
     private val _rfid = MutableLiveData<String>()
     val rfid: LiveData<String> get() = _rfid
 
+    private val _nfc = MutableLiveData<String>()
+    val nfc: LiveData<String> get() = _nfc
+
+    private val _rfidActive = MutableLiveData<Boolean>()
+    val rfidActive: LiveData<Boolean> get() = _rfidActive
+
+    private val _nfcActive = MutableLiveData<Boolean>()
+    val nfcActive: LiveData<Boolean> get() = _nfcActive
+
     fun startLive() {
         if (userId != null) {
+            observeCards()
+            observeUserData()
+            observeUserRequests()
+            observeUserTransactions()
+            obeserveUserWallet()
+            observeTopUpHistory()
+            observeTransit()
+        }
+    }
+
+    fun observeCards(){
+        if (userId != null){
             val userRFID = rfidRef.document(userId)
             userRFID.addSnapshotListener { document, error ->
                 if (error != null) {
@@ -110,18 +131,14 @@ class SharedViewModel : ViewModel() {
                 }
                 if (document != null && document.exists()) {
                     _rfid.value = document.getString("rfid") ?: ""
+                    _nfc.value = document.getString("nfc") ?: ""
+                    _rfidActive.value = document.getBoolean("rfidActive") ?: true
+                    _nfcActive.value = document.getBoolean("nfcActive") ?: false
                     Log.d("FirebaseData", "RFID has been set successfully")
                 } else {
                     Log.d("FirebaseData", "User document does not exist")
                 }
             }
-
-            observeUserData()
-            observeUserRequests()
-            observeUserTransactions()
-            obeserveUserWallet()
-            observeTopUpHistory()
-            observeTransit()
         }
     }
 

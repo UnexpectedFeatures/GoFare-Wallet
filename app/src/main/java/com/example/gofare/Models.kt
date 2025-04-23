@@ -22,7 +22,10 @@ data class Wallet(
 )
 
 data class RFID(
-    val rfid: String = ""
+    val rfid: String? = null,
+    val nfc: String? = null,
+    val rfidActive: Boolean? = true,
+    val nfcActive: Boolean? = false,
 )
 
 @Parcelize
