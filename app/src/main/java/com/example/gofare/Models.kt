@@ -33,6 +33,7 @@ data class Transaction(
     val currentBalance: Double = 0.0,
     val dateTime: String? = null,
     val discount: Boolean = false,
+    val discountAmount: Double = 0.0,
     val dropoff: String? = null,
     val loaned: Boolean = false,
     val loanedAmount: Double = 0.0,
@@ -75,7 +76,7 @@ data class Transit(
     val updatedAt: String? = null,
     val userId: String? = null,
     val userName: String? = null,
-    val vehicle: String? = null
+    val vehicle: String? = null,
 ): Parcelable
 
 

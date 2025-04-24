@@ -107,8 +107,6 @@ class ReceiptFragment : Fragment() {
             refundBtn.visibility = View.GONE
         }
 
-        val discountAmount = transaction?.totalAmount?.times(0.10)
-
         viewModel.currency.observe(viewLifecycleOwner) { currency ->
             transactionId.text = transaction?.transactionId
             pickup.text = transaction?.pickup
@@ -118,7 +116,7 @@ class ReceiptFragment : Fragment() {
             balance.text = "$currency " + transaction?.currentBalance.toString()
             total.text = "$currency " + transaction?.totalAmount.toString()
             discount.text = "${transaction?.discount.toString()}"
-            discountType.text = currency + " " + discountAmount?.let { ceil(it) }
+            discountType.text = currency + " " + transaction?.discountAmount
             if (transaction?.loaned == false){
                 remainingBalance.text = "$currency " + transaction?.remainingBalance.toString()
             }

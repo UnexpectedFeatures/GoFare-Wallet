@@ -322,15 +322,18 @@ class SharedViewModel : ViewModel() {
                     val allTransactions = mutableListOf<Transaction>()
                     for ((transactionId, value) in snapshot.data ?: emptyMap()) {
                         val data = value as? Map<*, *> ?: continue
+                        val discountDetails = data["discountDetails"] as? List<*>
+                        val firstDiscount = discountDetails?.firstOrNull() as? Map<*, *>
+
                         val transaction = Transaction(
                             transactionId = transactionId,
                             pickup = data["pickup"] as? String ?: "",
                             dropoff = data["dropoff"] as? String ?: "",
                             currentBalance = (data["currentBalance"] as? Number)?.toDouble() ?: 0.0,
-                            remainingBalance = (data["remainingBalance"] as? Number)?.toDouble()
-                                ?: 0.0,
+                            remainingBalance = (data["remainingBalance"] as? Number)?.toDouble() ?: 0.0,
                             totalAmount = (data["totalAmount"] as? Number)?.toDouble() ?: 0.0,
                             discount = data["discount"] as? Boolean ?: false,
+                            discountAmount = (firstDiscount?.get("amount") as? Number)?.toDouble() ?: 0.0,
                             loaned = data["loaned"] as? Boolean ?: false,
                             loanedAmount = (data["loanedAmount"] as? Number)?.toDouble() ?: 0.0,
                             dateTime = data["dateTime"] as? String ?: "",

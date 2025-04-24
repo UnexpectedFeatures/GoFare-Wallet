@@ -135,7 +135,6 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:clickable="true"
-                    android:focusable="true"
                     android:gravity="start|center_vertical"
                     android:text="Create an Account?"
                     android:textColor="@color/black" />
@@ -146,7 +145,6 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:clickable="true"
-                    android:focusable="true"
                     android:gravity="end|center_vertical"
                     android:text="Forgot Password?"
                     android:textColor="@color/black" />
